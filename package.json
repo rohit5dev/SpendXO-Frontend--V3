@@ -1,0 +1,74 @@
+{
+  "name": "spendxo",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@azure/msal-browser": "^3.28.0",
+    "@azure/msal-react": "^2.2.0",
+    "@canvasjs/react-charts": "^1.0.2",
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "@keyvaluesystems/react-waterfall-chart": "^0.1.5",
+    "@react-three/drei": "^9.34.3",
+    "@react-three/fiber": "^8.8.10",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "ag-grid-community": "^32.3.3",
+    "ag-grid-enterprise": "^32.3.3",
+    "ag-grid-react": "^32.3.3",
+    "axios": "^1.7.9",
+    "bootstrap": "^5.3.3",
+    "file-saver": "^2.0.5",
+    "html2canvas": "^1.4.1",
+    "http-proxy-middleware": "^3.0.3",
+    "leaflet": "^1.9.4",
+    "markdown-to-jsx": "^7.7.4",
+    "moment": "^2.30.1",
+    "react": "^18.3.1",
+    "react-apexcharts": "^1.5.0",
+    "react-beautiful-dnd": "^13.1.1",
+    "react-bootstrap": "^2.10.5",
+    "react-chartjs-2": "^5.3.0",
+    "react-circular-progressbar": "^2.2.0",
+    "react-dom": "^18.3.1",
+    "react-icons": "^5.3.0",
+    "react-leaflet": "^4.2.1",
+    "react-markdown": "^9.0.3",
+    "react-router-dom": "^6.28.0",
+    "react-scripts": "5.0.1",
+    "react-semicircle-progressbar": "^1.1.0",
+    "react-spinners": "^0.15.0",
+    "react-toastify": "^11.0.2",
+    "rsuite": "^5.74.2",
+    "sheetjs-style": "^0.15.8",
+    "typewriter-effect": "^2.21.0",
+    "universal-cookie": "^7.2.2",
+    "web-vitals": "^2.1.4",
+    "xlsx": "^0.18.5"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": " react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

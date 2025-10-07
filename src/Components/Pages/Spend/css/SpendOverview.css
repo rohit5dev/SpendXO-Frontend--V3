@@ -1,0 +1,9 @@
+.apexcharts-tooltip {
+  z-index: 99999 !important;
+  position: relative;
+}
+
+.leaflet-container {
+  position: relative;
+  z-index: 100;
+}

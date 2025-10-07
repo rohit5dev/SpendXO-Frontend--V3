@@ -1,0 +1,44 @@
+/* Toggle button styles */
+.navbar {
+  background: var(--bg-menu) !important;
+  color: var(--color-menu) !important;
+  width: 100%;
+  padding: 4px 10px !important;
+  display: flex;
+  justify-content: space-between;
+  box-shadow: 0px 0px 2px #b3bbc3;
+  border-radius: 2px;
+}
+.custom-toggle {
+  background: var(--bg-menu-icon) !important;
+  color: var(--color-menu-icon) !important;
+  border: none !important;
+  border-radius: 50% !important;
+  width: 35px !important;
+  height: 35px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.custom-item {
+  font-size: 12px !important;
+}
+
+.custom-icon {
+  margin-right: 10px;
+  color: var(--bg-menu-icon) !important;
+  font-size: 11px;
+}
+
+.custom-item:hover {
+  color: white !important;
+  background-color: var(--bg-menu-icon) !important;
+  text-decoration: none;
+}
+
+.custom-item:hover .custom-icon {
+  color: white !important;
+}

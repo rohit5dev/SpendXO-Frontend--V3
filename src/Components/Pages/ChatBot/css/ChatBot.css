@@ -1,0 +1,25 @@
+.chatbot-card {
+  background-color: #f5f5f5 !important;
+}
+.chatbot-container {
+  display: flex;
+  justify-content: center;
+  height: 92vh;
+  font-size: 12.5px;
+  background-color: #f5f5f5 !important;
+  color: var(--color-msg);
+}
+
+.ant-tooltip-inner {
+  font-size: 12px !important;
+}
+
+.chat-window h5 {
+  margin-bottom: 20px;
+}
+
+.chatbot-container .chat-section {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}

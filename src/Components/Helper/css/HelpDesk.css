@@ -1,0 +1,17 @@
+.help_desk_btn {
+  background-color: var(--bg-btn);
+  color: var(--color-btn);
+  border: none;
+  padding: 5px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  width: 100%;
+  margin-right: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.help_desk_btn :hover {
+  background-color: var(--bg-btn-hover);
+}

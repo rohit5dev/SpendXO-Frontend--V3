@@ -1,0 +1,216 @@
+.sidebar-bot {
+  width: 16%;
+  height: 100%; /* Use max-height instead of height */
+  background-color: rgba(81, 166, 176, 0.1) !important;
+  color: var(--color-main) !important;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-right: 4px solid #e7e7e7;
+}
+.sidenav-icon {
+  display: flex;
+  cursor: pointer;
+  font-size: 22px;
+  color: var(--color-main);
+  transition: color 0.3s ease-in-out;
+}
+.sidenav-icon:hover {
+  color: var(--color-main-light);
+  cursor: pointer;
+}
+
+/* sidebar title */
+.nav-title {
+  padding: 16px 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  /* padding-bottom: 20px; */
+}
+
+.chatbot-title {
+  color: var(--color-main); /* Bootstrap text-secondary */
+  font-weight: bold;
+  font-size: 20px !important;
+  margin: 0;
+}
+
+.icon-container {
+  display: flex;
+  align-items: end;
+  gap: 10px;
+}
+
+.chat-icon {
+  font-size: 21px;
+}
+
+.chat-history {
+  height: 80%;
+  overflow-y: auto; /* Ensure chat history stays within the height of the sidebar */
+}
+.seperator {
+  color: var(--color-seperator) !important;
+}
+
+.chat-item {
+  margin-top: 2px;
+  padding: 8px 10px 10px !important;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  color: var(--color-main);
+  background-color: transparent;
+  text-align: start;
+  display: flex;
+  font-weight: 550;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chats-container {
+  height: 90vh;
+}
+.chat-item:hover {
+  cursor: pointer;
+  background-color: rgba(81, 166, 176, 0.2);
+  .chat-icon {
+    opacity: 1;
+  }
+}
+
+.chat-title {
+  display: block; /* Makes sure the ellipsis works on inline elements */
+}
+
+.chat-title span {
+  display: inline-block;
+  max-width: 200px; /* Adjust as needed */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}
+
+.muted {
+  color: var(--color-seperator);
+  padding: 0px 10px;
+}
+
+/* chat item */
+.chat-item {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.chat-item.active {
+  background-color: var(--color-main);
+  color: white !important;
+}
+
+/* test */
+.edit-input {
+  width: calc(100% - 24px);
+  padding: 4px;
+  border: none;
+  outline: none;
+  background-color: #f5f5f5;
+  font-weight: 400;
+  border-radius: 4px;
+  font-size: 13px;
+  color: grey;
+}
+.edit-input:focus {
+  border: none !important;
+  caret-color: grey;
+}
+
+.chat-history-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0px;
+  align-items: center;
+}
+
+.chat-icon {
+  cursor: pointer;
+}
+
+.tooltip {
+  border-radius: 10px !important;
+}
+
+.chat-history-item .chat-icon {
+  font-size: 14px;
+  color: var(--color-sidenav);
+  opacity: 0; /* Initially hidden */
+  border: none; /* Remove any outline or border */
+  transition: opacity 0.3s ease-in-out, color 0.3s ease-in-out; /* Smooth transition for color */
+}
+
+.chat-history-item .chat-icon:focus {
+  outline: none; /* Remove focus outline */
+}
+
+.chat-history-item:hover .chat-icon,
+.chat-history-item.popover-active .chat-icon {
+  opacity: 1; /* Show icon on hover or when popover is active */
+}
+
+.chat-item.active:hover .chat-icon,
+.chat-item.active.popover-active .chat-icon {
+  color: white; /* Change icon color to white when hovering over an active chat or when popover is active */
+}
+
+.custom-tooltip {
+  font-size: 12px !important;
+}
+
+.chat-history-footer {
+  bottom: 0;
+  width: 100%;
+  padding: 10px;
+  background: #f8f9fa; /* Light background */
+  text-align: center;
+  border-top: 1px solid #ddd;
+}
+
+/* .nav-title .logo {
+  display: flex;
+  height: 5vh;
+} */
+
+.secondary-btn {
+  padding: 8px 10px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  color: var(--color-sidenav);
+  background-color: var(--bg-btn-newchat);
+  display: flex;
+  text-align: center;
+  justify-content: space-between;
+  align-items: center;
+  .chat-icon {
+    font-size: 18px;
+  }
+}
+
+.secondary-btn:hover {
+  background-color: var(--bg-btn-newchat-hover);
+}
+
+.outlined-btn {
+  background-color: transparent !important;
+  /* border: 1px solid var(--bg-btn) !important; */
+  color: var(--color-main) !important;
+}
+
+.outlined-btn:hover {
+  background-color: var(--color-main) !important;
+  color: white !important;
+  /* border-color: var(--bg-btn-hover) !important; */
+}

@@ -1,0 +1,20 @@
+/* Custom Tooltip */
+.custom-tooltip {
+  background-color: white !important;
+  color: black !important;
+  border: 1px solid #ccc !important;
+}
+
+/* Override Bootstrap tooltip inner */
+.custom-tooltip .tooltip-inner {
+  background-color: white !important;
+  color: black !important;
+  border-radius: 4px !important;
+  padding: 6px 12px !important;
+}
+
+/* Customize Tooltip Arrow */
+.custom-tooltip .tooltip-arrow::before {
+  border-color: none !important; /* Ensures the arrow matches tooltip background */
+  border-left-color: white !important;
+}

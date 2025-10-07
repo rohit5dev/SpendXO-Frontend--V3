@@ -1,0 +1,94 @@
+.input-field {
+  display: flex;
+  padding: 10px;
+  /* background-color: #f5f5f5 !important; */
+  background-color: #f3f3f3 !important;
+  
+}
+
+.input-field input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.input-field button {
+  height: 32px;
+  width: 32px;
+  padding: 0;
+  background-color: var(--color-main);
+  color: var(--color-msg);
+  border: none;
+  border-radius: 50%;
+  margin-left: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* when no chat is available */
+.placeholder {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--color-sidenav);
+}
+
+.input-box {
+  border: none !important;
+  outline: none;
+  color: var(--color-sidenav);
+  background-color: transparent !important;
+  
+}
+.input-box:focus {
+  outline: none;
+  caret-color: var(--color-sidenav);
+}
+
+.attach {
+  height: 32px;
+  width: 32px;
+  font-size: 16px !important;
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-main) !important;
+  background-color: transparent !important;
+  padding: 0;
+}
+
+
+.attach:hover {
+  background-color: var(--color-main) !important;
+  color: white !important;
+  border-radius: 50%;
+}
+
+
+.suggestions-list{
+  display: flex;
+  flex-direction: column;
+  text-align: start;
+
+}
+.suggestions-item{
+  border-bottom: 1px solid #ccc;
+   padding: 8px 0;
+   cursor:pointer
+}
+.suggestions-item:hover{
+  color:var(--color-main);
+}
+
+
+.card-rounded-top{
+  border-radius: 20px 20px 0px 0px;
+}
+
+.card-rounded-bottom{
+  border-radius: 0px 0px 20px 20px;
+}

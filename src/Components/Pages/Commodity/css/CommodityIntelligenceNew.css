@@ -1,0 +1,28 @@
+.kpi-main {
+  margin: 0px;
+  font-size: 18px;
+  color: var(--color-main-light);
+  font-weight: 550;
+  padding: 0px;
+}
+
+.kpi-secondary-title {
+  font-size: 10px;
+  margin: 0;
+  margin-left: 10px;
+  text-align: center;
+}
+.kpi-secondary-data-1 {
+  color: var(--color-main-light);
+  font-weight: 550;
+  font-size: 13px ;
+}
+.kpi-secondary-data-2 {
+  color: #f97061;
+  font-weight: 550;
+  font-size: 13px;
+}
+
+.commodity-data .global-cards{
+  background-color: rgba(255, 255, 255, 0.753);
+}

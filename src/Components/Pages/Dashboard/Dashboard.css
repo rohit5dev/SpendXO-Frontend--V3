@@ -1,0 +1,165 @@
+/* Hover effect for KPI cards */
+
+.dash-container {
+  display: flex;
+}
+
+.dashboard-left {
+  width: 75%;
+}
+
+.dashboard {
+  display: flex;
+}
+
+.dashboard-right {
+  width: 25%;
+  padding-top: 5px;
+  padding-left: 8px;
+}
+
+.kpi-box {
+  overflow: hidden;
+  flex: 1; /* Make each box take equal width */
+  height: 160px;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0px 5px 5px #d5dde5;
+  padding: 10px;
+  text-align: left;
+  /* display: flex;
+  align-items: center; */
+}
+
+.kpi-list {
+  font-size: 9px;
+  list-style: none;
+  padding: 0px;
+  color: grey;
+  /* padding-right: 10px; */
+}
+
+.kpi-mid {
+  display: flex;
+  justify-content: space-between;
+  height: 90px;
+  margin-top: 10px;
+}
+
+.kpi-date {
+  margin: 0px;
+  font-size: 10px;
+  color: grey;
+}
+
+.supplier-risk-chart {
+  padding: 10px;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0px 5px 5px #d5dde5;
+  text-align: left;
+  height: 130px !important;
+}
+
+.help-desk {
+  margin-top: 5px;
+  padding: 10px;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0px 5px 5px #d5dde5;
+  height: 150px;
+  text-align: left;
+  overflow: hidden;
+}
+
+.category-chart {
+  padding: 10px;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0px 5px 5px #d5dde5;
+  text-align: left;
+  margin-top: 5px;
+  height: 40vh;
+}
+
+.spend-chart {
+  padding: 10px;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0px 5px 5px #d5dde5;
+  text-align: left;
+  margin-top: 5px;
+  width: 50%;
+  height: 60vh;
+}
+
+.recent-list {
+  padding: 10px;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0px 5px 5px #d5dde5;
+  text-align: left;
+  margin-top: 5px;
+  width: 49%;
+  margin-left: 10px;
+  height: 60vh;
+  overflow: hidden;
+}
+
+.recent-table {
+  font-size: 12px;
+  margin-top: 5px;
+  border-top: 1px solid #d8e0eb;
+}
+
+.dash-kpi-head {
+  margin: 0px;
+  font-weight: 550;
+  font-size: 13px;
+  color: var(--color-head);
+}
+
+.dash-kpi-num {
+  color: var(--color-num) !important;
+  font-weight: 550;
+  font-size: 18px;
+  padding: 5px;
+}
+
+.dash-kpi-icon {
+  color: var(--color-icon) !important;
+  font-size: 25px;
+}
+
+/* Alert */
+
+.alert-item {
+  border-bottom: 1px solid #e9e9e9;
+}
+
+.alert-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.critical-alert-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: #d9534f; /* Red color for critical alerts */
+  border-radius: 2px;
+}
+
+.alert-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #d9534f;
+}
+
+.alert-detail {
+  font-size: 0.85rem;
+  color: #666;
+}
+

@@ -1,0 +1,26 @@
+.card-link {
+  color: #007bff;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.image-container {
+  position: relative;
+  display: inline-block;
+}
+
+.image-container img {
+  display: block;
+}
+
+/* text on image  */
+.classification-text {
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  text-align: center;
+  width: 90%;
+}
+

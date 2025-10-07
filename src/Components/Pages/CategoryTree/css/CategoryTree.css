@@ -1,0 +1,47 @@
+.modal-icon-button {
+  font-size: 20px;
+  margin-left: 10px;
+  font-size: 10px;
+  width: 30px;
+  height: 30px;
+  color: rgb(91, 91, 91); /* Icon color */
+  border: none;
+  border-radius: 5px; /* Optional rounded corners */
+  display: flex; /* Flexbox to center the icon */
+  justify-content: center; /* Horizontally center the icon */
+  align-items: center; /* Vertically center the icon */
+  cursor: pointer; /* Show pointer cursor on hover */
+}
+
+.modal-input {
+  padding: 8px 16px;
+  border-radius: 5px; /* Optional rounded corners */
+  border: 1px solid #e4e7eb;
+  transition: border-color 0.3s ease; /* Smooth transition */
+}
+
+.modal-input:focus {
+  border-color: #007bff; /* Blue border on focus */
+  outline: none; /* Removes default outline */
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.5); /* Blue glow effect */
+}
+
+/* .add-category-input {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.add-category-btn {
+  margin-left: 10px;
+  font-size: 15px;
+} */
+
+/* .react-select {
+  font-size: 13px;
+} */
+
+/* .form-footer {
+  padding: 0px;
+} */
