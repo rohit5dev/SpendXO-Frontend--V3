@@ -4,21 +4,26 @@ import "./css/CommodityIntelligenceNew.css";
 import LatestNewsTab from "./Tabs/LatestNewsTab";
 import CommodityOverviewTab from "./Tabs/CommodityOverviewTab";
 import CommodityOverviewTab3 from "./Tabs/CommodityOverviewTab3";
+import OverviewTab from "./Tabs/OverviewTab";
+import DeltaDecompositionTab from "./Tabs/DeltaDecompositionTab";
+import MacroEconomicIndicatorTab from "./Tabs/MacroEconomicIndicatorTab";
+import PriceDecompositionTab from "./Tabs/PriceDecompositionTab";
+import EventImpactTab from "./Tabs/EventImpactTab";
 
 const CommodityIntelligenceNew = () => {
-  const [activeTab, setActiveTab] = useState("overview");
-  const [commodityType, setCommodityType] = useState(
-    "Flat Steel- Hot Rolled Coil (HRC)​"
-  ); // New state for commodity type
-  const [specification, setSpecification] = useState("IS 2062 E250​​"); // New state for commodity type
-  const [region, setRegion] = useState("India​​"); // New state for commodity type
+  const [activeTab, setActiveTab] = useState("Overview");
+  // const [commodityType, setCommodityType] = useState(
+  //   "Flat Steel- Hot Rolled Coil (HRC)​"
+  // ); // New state for commodity type
+  // const [specification, setSpecification] = useState("IS 2062 E250​​"); // New state for commodity type
+  // const [region, setRegion] = useState("India​​"); // New state for commodity type
 
   return (
     <div
       className="global-cards  p-2 mt-2"
       style={{ backgroundColor: "rgba(255, 255, 255, 0.29)" }}
     >
-      <div className=" d-flex justify-content-between align-items-center">
+      {/* <div className=" d-flex justify-content-between align-items-center">
         <h5
           className="head-theme"
           style={{
@@ -80,7 +85,7 @@ const CommodityIntelligenceNew = () => {
             </Form.Select>
           </Form.Group>
         </div>
-      </div>
+      </div> */}
 
       {/* TABS */}
       <Tabs
@@ -91,14 +96,31 @@ const CommodityIntelligenceNew = () => {
           width: "100%",
         }}
       >
-        <Tab eventKey="overview" title="Commodity Overview" className="mt-2">
+        {/* <Tab eventKey="overview" title="Commodity Overview" className="mt-2">
           <CommodityOverviewTab />
-        </Tab>
+        </Tab> */}
         {/* <Tab eventKey="overview2" title="Commodity Overview - New" className="mt-2">
           <CommodityOverviewTab3 />
         </Tab> */}
-        <Tab eventKey="news" title="Latest News">
+        {/* <Tab eventKey="news" title="Latest News">
           <LatestNewsTab />
+        </Tab> */}
+
+        {/* New Version Commodity */}
+        <Tab eventKey="Overview" title="Overview">
+          <OverviewTab />
+        </Tab>
+        <Tab eventKey="DeltaDecomposition" title="Delta Decomposition">
+          <DeltaDecompositionTab />
+        </Tab>
+        <Tab eventKey="MacroEconomicIndicator" title="Macroeconomic Indicator">
+          <MacroEconomicIndicatorTab />
+        </Tab>
+        <Tab eventKey="PriceDecomposition" title="Price Decomposition">
+          <PriceDecompositionTab />
+        </Tab>
+        <Tab eventKey="EventImpact" title="Event Impact">
+          <EventImpactTab />
         </Tab>
       </Tabs>
     </div>
