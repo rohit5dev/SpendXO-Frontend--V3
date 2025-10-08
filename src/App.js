@@ -17,11 +17,6 @@ import DocumentViewer from "./Components/Pages/KnowledgeAndLearningHub/HelperCom
 import KnowledgeHubProcessTransformation from "./Components/Pages/KnowledgeAndLearningHub/Tabs/KnowledgeHubProcessTransformation.js";
 import DiagramViewer from "./Components/Pages/KnowledgeAndLearningHub/HelperComponents/DiagramViewer.js";
 
-// Category & Commodity Intelligence
-const CommodityLanding = lazy(() =>
-  import("./Components/Pages/Commodity/CommodityLanding.js")
-);
-
 // Helper Components
 const MenuNavbar = lazy(() => import("./Components/Helper/Navbar"));
 const Sidenavbar = lazy(() => import("./Components/Helper/Sidenav"));
