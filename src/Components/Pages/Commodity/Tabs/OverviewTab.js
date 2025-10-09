@@ -27,6 +27,13 @@ const OverviewTab = () => {
   const forecastingChartContainerRef = useRef(null);
   const forecastingChartRef = useRef(null);
 
+  // Commodity options based on keys in commodityPricingData
+  const forecastingCommodityOptions = [
+    { key: "hrcPriceData", label: "HRC Price" },
+    { key: "crcPriceData", label: "CRC Price" },
+  ];
+
+  // Helper function to parse dates
   const forecastingParseDate = (dateString) => {
     if (!dateString) {
       console.warn("Invalid date string:", dateString);
@@ -36,6 +43,35 @@ const OverviewTab = () => {
     return new Date(year, month - 1, day);
   };
 
+  // Extract unique years from all commodities data
+  const forecastingUniqueYears = React.useMemo(() => {
+    const allYears = new Set();
+
+    // Add years from all commodities
+    forecastingCommodityOptions.forEach((commodity) => {
+      const data =
+        commodityOverviewData.commodityPricingData[commodity.key] || [];
+      data.forEach((item) => {
+        if (item.date) {
+          const year = forecastingParseDate(item.date).getFullYear();
+          allYears.add(year);
+        }
+      });
+    });
+
+    return ["All Years", ...Array.from(allYears).sort((a, b) => b - a)];
+  }, []);
+
+  // Filter data based on selected year
+  const forecastingFilterDataByYear = (data, year) => {
+    if (year === "All Years") return data;
+    return data.filter((item) => {
+      const parsedDate = forecastingParseDate(item.Date || item.date);
+      return parsedDate.getFullYear().toString() === year;
+    });
+  };
+
+  // Filter data by basis (Monthly, Quarterly, Yearly)
   const forecastingFilterDataByBasis = (basis, data) => {
     const selectedData = data;
     if (basis === "Monthly Data") {
@@ -89,12 +125,6 @@ const OverviewTab = () => {
     return selectedData;
   };
 
-  // Commodity options based on keys in commodityPricingData
-  const forecastingCommodityOptions = [
-    { key: "hrcPriceData", label: "HRC Price" },
-    { key: "crcPriceData", label: "CRC Price" },
-  ];
-
   // Dynamic y-axis and legend name based on selected commodity
   const forecastingYAxisTitle =
     globalSelectedCommodity === "hrcPriceData"
@@ -103,65 +133,67 @@ const OverviewTab = () => {
   const forecastingLegendName =
     globalSelectedCommodity === "hrcPriceData" ? "HRC Price" : "CRC Price";
 
-  // Extract unique years from selected commodity data
-  const forecastingUniqueYears = [
-    "All Years",
-    ...new Set(
-      (
-        commodityOverviewData.commodityPricingData[globalSelectedCommodity] ||
-        []
-      ).map((item) => forecastingParseDate(item.date).getFullYear())
-    ),
-  ];
-
-  // Filter data based on selected year
-  const forecastingFilterDataByYear = (data, year) => {
-    if (year === "All Years") return data;
-    return data.filter((item) => {
-      const parsedDate = forecastingParseDate(item.Date || item.date);
-      return parsedDate.getFullYear().toString() === year;
-    });
-  };
-
   // Prepare filtered data for chart - SEPARATE historical and forecasted data
-  const commodityData =
-    commodityOverviewData.commodityPricingData[globalSelectedCommodity] || [];
+  const commodityData = React.useMemo(
+    () =>
+      commodityOverviewData.commodityPricingData[globalSelectedCommodity] || [],
+    [globalSelectedCommodity]
+  );
 
   // Separate historical and forecasted data with best buy prices
-  const historicalData = commodityData
-    .filter((item) => item.price !== undefined)
-    .map((item) => ({
-      Date: item.date,
-      HRC_Price: item.price,
-      isForecasted: false,
-      best_buy_price: item.best_buy_price,
-    }))
-    .sort(
-      (a, b) => forecastingParseDate(a.Date) - forecastingParseDate(b.Date)
-    );
+  const historicalData = React.useMemo(
+    () =>
+      commodityData
+        .filter((item) => item.price !== undefined)
+        .map((item) => ({
+          Date: item.date,
+          HRC_Price: item.price,
+          isForecasted: false,
+          best_buy_price: item.best_buy_price,
+        }))
+        .sort(
+          (a, b) => forecastingParseDate(a.Date) - forecastingParseDate(b.Date)
+        ),
+    [commodityData]
+  );
 
-  const forecastedData = commodityData
-    .filter((item) => item.forecasted_price !== undefined)
-    .map((item) => ({
-      Date: item.date,
-      HRC_Price: item.forecasted_price,
-      isForecasted: true,
-      best_buy_price: item.best_buy_price,
-    }))
-    .sort(
-      (a, b) => forecastingParseDate(a.Date) - forecastingParseDate(b.Date)
-    );
+  const forecastedData = React.useMemo(
+    () =>
+      commodityData
+        .filter((item) => item.forecasted_price !== undefined)
+        .map((item) => ({
+          Date: item.date,
+          HRC_Price: item.forecasted_price,
+          isForecasted: true,
+          best_buy_price: item.best_buy_price,
+        }))
+        .sort(
+          (a, b) => forecastingParseDate(a.Date) - forecastingParseDate(b.Date)
+        ),
+    [commodityData]
+  );
 
   // Combine and filter by year
-  const allCommodityData = [...historicalData, ...forecastedData];
-  const forecastingFilteredCommodityData = forecastingFilterDataByYear(
-    allCommodityData,
-    globalSelectedYear
-  ).sort((a, b) => forecastingParseDate(a.Date) - forecastingParseDate(b.Date));
+  const allCommodityData = React.useMemo(
+    () => [...historicalData, ...forecastedData],
+    [historicalData, forecastedData]
+  );
 
-  const forecastingFilteredChartData = forecastingFilterDataByBasis(
-    forecastingDataBasis,
-    forecastingFilteredCommodityData
+  const forecastingFilteredCommodityData = React.useMemo(
+    () =>
+      forecastingFilterDataByYear(allCommodityData, globalSelectedYear).sort(
+        (a, b) => forecastingParseDate(a.Date) - forecastingParseDate(b.Date)
+      ),
+    [allCommodityData, globalSelectedYear]
+  );
+
+  const forecastingFilteredChartData = React.useMemo(
+    () =>
+      forecastingFilterDataByBasis(
+        forecastingDataBasis,
+        forecastingFilteredCommodityData
+      ),
+    [forecastingDataBasis, forecastingFilteredCommodityData]
   );
 
   // Filter KPIs data based on global selections
@@ -172,16 +204,24 @@ const OverviewTab = () => {
     return baseKPIs.map((kpi) => {
       if (globalSelectedCommodity === "hrcPriceData") {
         // Return HRC specific KPIs or all if not commodity specific
-        return kpi;
-      } else {
-        // Return CRC specific KPIs or adjust values for CRC
         return {
           ...kpi,
-          // You can modify KPI values based on commodity if needed
           items: kpi.items.map((item) => ({
             ...item,
-            // Example: Adjust values for CRC if different from HRC
-            // value: item.value.replace("HRC", "CRC") // if values contain commodity names
+            // Update labels for HRC
+            label: item.label.replace(/CRC/g, "HRC"),
+            value: item.value.replace(/CRC/g, "HRC"),
+          })),
+        };
+      } else {
+        // Return CRC specific KPIs
+        return {
+          ...kpi,
+          items: kpi.items.map((item) => ({
+            ...item,
+            // Update labels for CRC
+            label: item.label.replace(/HRC/g, "CRC"),
+            value: item.value.replace(/HRC/g, "CRC"),
           })),
         };
       }
@@ -192,14 +232,16 @@ const OverviewTab = () => {
   const filteredNegotiationLevers = React.useMemo(() => {
     const baseLevers = commodityOverviewData.negotiationLeversData || [];
 
-    // Filter or adjust negotiation levers based on selected commodity
+    // Filter based on selected commodity
     if (globalSelectedCommodity === "hrcPriceData") {
       return baseLevers.filter(
-        (lever) => !lever.quarter.includes("CRC") // Keep HRC specific or general levers
+        (lever) =>
+          lever.quarter.includes("HRC") || !lever.quarter.includes("CRC")
       );
     } else {
       return baseLevers.filter(
-        (lever) => !lever.quarter.includes("HRC") // Keep CRC specific or general levers
+        (lever) =>
+          lever.quarter.includes("CRC") || !lever.quarter.includes("HRC")
       );
     }
   }, [globalSelectedCommodity]);
@@ -568,6 +610,429 @@ const OverviewTab = () => {
     ];
   }, [forecastingFilteredChartData]);
 
+  // Delta View Chart with global filters applied
+  const deltaViewChart = React.useMemo(() => {
+    const commodityKey =
+      globalSelectedCommodity === "hrcPriceData" ? "hrc" : "crc";
+    const deltaData = commodityOverviewData.deltaViewChartData?.[
+      commodityKey
+    ] || {
+      categories: [],
+      actualDelta: [],
+      forecastedDelta: [],
+    };
+
+    // Extract years from categories for filtering
+    const categoriesWithYears = deltaData.categories.map((category, index) => {
+      const yearMatch = category.match(/\d{4}/);
+      const year = yearMatch ? yearMatch[0] : "";
+      return {
+        category,
+        year,
+        actualDelta: deltaData.actualDelta[index],
+        forecastedDelta: deltaData.forecastedDelta[index],
+      };
+    });
+
+    // Apply year filter
+    let filteredData;
+    if (globalSelectedYear !== "All Years") {
+      filteredData = categoriesWithYears.filter(
+        (item) => item.year === globalSelectedYear
+      );
+    } else {
+      filteredData = categoriesWithYears;
+    }
+
+    // Apply data basis filter (Quarterly, Yearly)
+    let finalData = filteredData;
+
+    if (forecastingDataBasis === "Yearly Data") {
+      // Group by year and calculate averages
+      const yearlyGroups = {};
+      filteredData.forEach((item) => {
+        if (!yearlyGroups[item.year]) {
+          yearlyGroups[item.year] = {
+            categories: [],
+            actualDelta: [],
+            forecastedDelta: [],
+            count: 0,
+          };
+        }
+        yearlyGroups[item.year].categories.push(item.category);
+        if (item.actualDelta !== null)
+          yearlyGroups[item.year].actualDelta.push(item.actualDelta);
+        if (item.forecastedDelta !== null)
+          yearlyGroups[item.year].forecastedDelta.push(item.forecastedDelta);
+        yearlyGroups[item.year].count++;
+      });
+
+      finalData = Object.keys(yearlyGroups).map((year) => ({
+        category: year,
+        year: year,
+        actualDelta:
+          yearlyGroups[year].actualDelta.length > 0
+            ? yearlyGroups[year].actualDelta.reduce((a, b) => a + b, 0) /
+              yearlyGroups[year].actualDelta.length
+            : null,
+        forecastedDelta:
+          yearlyGroups[year].forecastedDelta.length > 0
+            ? yearlyGroups[year].forecastedDelta.reduce((a, b) => a + b, 0) /
+              yearlyGroups[year].forecastedDelta.length
+            : null,
+      }));
+    }
+
+    const finalCategories = finalData.map((item) => item.category);
+    const finalActualDelta = finalData.map((item) => item.actualDelta);
+    const finalForecastedDelta = finalData.map((item) => item.forecastedDelta);
+
+    return {
+      options: {
+        chart: {
+          type: "line",
+          height: 400,
+          zoom: { enabled: true },
+          toolbar: { show: true },
+          events: {
+            dataPointSelection: (event, chartContext, config) => {
+              if (config && config.dataPointIndex !== undefined) {
+                const selectedData = finalData[config.dataPointIndex];
+                if (selectedData) {
+                  console.log("Delta View clicked:", selectedData);
+                }
+              }
+            },
+          },
+        },
+        stroke: {
+          curve: "stepline",
+          width: 3,
+          dashArray: [0, 5], // Solid for actual, dashed for forecasted
+        },
+        dataLabels: {
+          enabled: true,
+          formatter: function (val) {
+            return val !== null ? `₹${val.toFixed(2)}` : "";
+          },
+          style: {
+            fontSize: "10px",
+          },
+        },
+        xaxis: {
+          categories: finalCategories,
+          labels: {
+            rotate: -45,
+            style: {
+              fontSize: "10px",
+            },
+          },
+          title: {
+            text: "Time Period",
+            style: {
+              fontSize: "12px",
+              fontWeight: "bold",
+            },
+          },
+        },
+        yaxis: {
+          title: {
+            text: "Delta Value (₹/Tonne)",
+            style: {
+              fontSize: "12px",
+              fontWeight: "bold",
+            },
+          },
+          labels: {
+            formatter: function (value) {
+              return "₹" + (value !== null ? value.toFixed(2) : "0");
+            },
+          },
+        },
+        grid: {
+          borderColor: "#f1f1f1",
+        },
+        colors: ["#008FFB", "#00E396"],
+        markers: {
+          size: 4,
+          hover: {
+            size: 6,
+          },
+        },
+        legend: {
+          position: "top",
+        },
+        tooltip: {
+          y: {
+            formatter: function (value) {
+              return value !== null
+                ? "₹" + value.toFixed(2) + "/Tonne"
+                : "No data";
+            },
+          },
+          custom: function ({ series, seriesIndex, dataPointIndex, w }) {
+            const dataPoint = finalData[dataPointIndex];
+            if (!dataPoint) return "";
+
+            return `
+              <div style="padding: 8px 12px">
+                <strong>${dataPoint.category}</strong><br/>
+                ${seriesIndex === 0 ? "Actual Delta" : "Forecasted Delta"}: 
+                ${
+                  series[seriesIndex][dataPointIndex] !== null
+                    ? "₹" +
+                      series[seriesIndex][dataPointIndex].toFixed(2) +
+                      "/Tonne"
+                    : "No data"
+                }
+              </div>
+            `;
+          },
+        },
+      },
+      series: [
+        {
+          name: "Actual Delta",
+          data: finalActualDelta,
+        },
+        {
+          name: "Forecasted Delta",
+          data: finalForecastedDelta,
+        },
+      ],
+    };
+  }, [globalSelectedCommodity, globalSelectedYear, forecastingDataBasis]);
+
+  // Settled Delta Chart with global filters applied
+  const settledDeltaChart = React.useMemo(() => {
+    const commodityKey =
+      globalSelectedCommodity === "hrcPriceData" ? "hrc" : "crc";
+    const settledData = commodityOverviewData.settledDeltaChartData?.[
+      commodityKey
+    ] || {
+      categories: [],
+      actualDelta: [],
+      settledDelta: [],
+    };
+
+    // Extract years from categories for filtering
+    const categoriesWithYears = settledData.categories.map(
+      (category, index) => {
+        const yearMatch = category.match(/\d{4}/);
+        const year = yearMatch ? yearMatch[0] : "";
+        return {
+          category,
+          year,
+          actualDelta: settledData.actualDelta[index],
+          settledDelta: settledData.settledDelta[index],
+        };
+      }
+    );
+
+    // Apply year filter
+    let filteredData;
+    if (globalSelectedYear !== "All Years") {
+      filteredData = categoriesWithYears.filter(
+        (item) => item.year === globalSelectedYear
+      );
+    } else {
+      filteredData = categoriesWithYears;
+    }
+
+    // Apply data basis filter (Quarterly, Yearly)
+    let finalData = filteredData;
+
+    if (forecastingDataBasis === "Yearly Data") {
+      // Group by year and calculate averages
+      const yearlyGroups = {};
+      filteredData.forEach((item) => {
+        if (!yearlyGroups[item.year]) {
+          yearlyGroups[item.year] = {
+            categories: [],
+            actualDelta: [],
+            settledDelta: [],
+            actualCount: 0,
+            settledCount: 0,
+          };
+        }
+        yearlyGroups[item.year].categories.push(item.category);
+        if (item.actualDelta !== null) {
+          yearlyGroups[item.year].actualDelta.push(item.actualDelta);
+          yearlyGroups[item.year].actualCount++;
+        }
+        if (item.settledDelta !== null) {
+          yearlyGroups[item.year].settledDelta.push(item.settledDelta);
+          yearlyGroups[item.year].settledCount++;
+        }
+      });
+
+      finalData = Object.keys(yearlyGroups).map((year) => ({
+        category: year,
+        year: year,
+        actualDelta:
+          yearlyGroups[year].actualDelta.length > 0
+            ? yearlyGroups[year].actualDelta.reduce((a, b) => a + b, 0) /
+              yearlyGroups[year].actualDelta.length
+            : null,
+        settledDelta:
+          yearlyGroups[year].settledDelta.length > 0
+            ? yearlyGroups[year].settledDelta.reduce((a, b) => a + b, 0) /
+              yearlyGroups[year].settledDelta.length
+            : null,
+      }));
+    }
+
+    const finalCategories = finalData.map((item) => item.category);
+    const finalActualDelta = finalData.map((item) => item.actualDelta);
+    const finalSettledDelta = finalData.map((item) => item.settledDelta);
+
+    return {
+      options: {
+        chart: {
+          type: "line",
+          height: 400,
+          zoom: { enabled: true },
+          toolbar: { show: true },
+          events: {
+            dataPointSelection: (event, chartContext, config) => {
+              if (config && config.dataPointIndex !== undefined) {
+                const selectedData = finalData[config.dataPointIndex];
+                if (selectedData) {
+                  console.log("Settled Delta clicked:", selectedData);
+                }
+              }
+            },
+          },
+        },
+        stroke: {
+          curve: "stepline",
+          width: 3,
+          dashArray: [0, 5], // Solid for actual, dashed for settled
+        },
+        dataLabels: {
+          enabled: true,
+          formatter: function (val) {
+            return val !== null ? `₹${val.toFixed(2)}` : "";
+          },
+          style: {
+            fontSize: "10px",
+          },
+        },
+        xaxis: {
+          categories: finalCategories,
+          labels: {
+            rotate: -45,
+            style: {
+              fontSize: "10px",
+            },
+          },
+          title: {
+            text: "Time Period",
+            style: {
+              fontSize: "12px",
+              fontWeight: "bold",
+            },
+          },
+        },
+        yaxis: {
+          title: {
+            text: "Delta Value (₹/Tonne)",
+            style: {
+              fontSize: "12px",
+              fontWeight: "bold",
+            },
+          },
+          labels: {
+            formatter: function (value) {
+              return "₹" + (value !== null ? value.toFixed(2) : "0");
+            },
+          },
+        },
+        grid: {
+          borderColor: "#f1f1f1",
+        },
+        colors: ["#008FFB", "#FF4560"], // Different color for settled delta
+        markers: {
+          size: 4,
+          hover: {
+            size: 6,
+          },
+        },
+        legend: {
+          position: "top",
+        },
+        tooltip: {
+          y: {
+            formatter: function (value) {
+              return value !== null
+                ? "₹" + value.toFixed(2) + "/Tonne"
+                : "Not Settled";
+            },
+          },
+          custom: function ({ series, seriesIndex, dataPointIndex, w }) {
+            const dataPoint = finalData[dataPointIndex];
+            if (!dataPoint) return "";
+
+            const seriesName =
+              seriesIndex === 0 ? "Actual Delta" : "Settled Delta";
+            const value = series[seriesIndex][dataPointIndex];
+            const displayValue =
+              value !== null
+                ? "₹" + value.toFixed(2) + "/Tonne"
+                : "Not Settled Yet";
+
+            return `
+              <div style="padding: 8px 12px">
+                <strong>${dataPoint.category}</strong><br/>
+                ${seriesName}: ${displayValue}
+            </div>
+          `;
+          },
+        },
+
+        annotations: {
+          points: finalData
+            .map((item, index) => {
+              if (item.settledDelta === null) {
+                return {
+                  x: item.category,
+                  y: item.actualDelta,
+                  marker: {
+                    size: 6,
+                    fillColor: "#FF4560",
+                    strokeColor: "#fff",
+                    strokeWidth: 2,
+                    radius: 2,
+                  },
+                  label: {
+                    borderColor: "#FF4560",
+                    style: {
+                      color: "#fff",
+                      background: "#FF4560",
+                    },
+                    text: "Pending Settlement",
+                    offsetY: -20,
+                  },
+                };
+              }
+              return undefined;
+            })
+            .filter((point) => point !== undefined),
+        },
+      },
+      series: [
+        {
+          name: "Actual Delta",
+          data: finalActualDelta,
+        },
+        {
+          name: "Settled Delta",
+          data: finalSettledDelta,
+        },
+      ],
+    };
+  }, [globalSelectedCommodity, globalSelectedYear, forecastingDataBasis]);
+
   const forecastingResetFiltersForecastChart = () => {
     setForecastingDataBasis("Monthly Data");
     setForecastingSelectedNews([]);
@@ -815,25 +1280,73 @@ const OverviewTab = () => {
               </div>
             </div>
           </Tab>
+
           <Tab eventKey="DeltaView" title="Delta View">
-            <p />
+            <div className="row g-2 mb-2">
+              <div className="col-12">
+                <div
+                  className="w-100 mb-2 global-cards mt-2"
+                  style={{ minHeight: "380px" }}
+                >
+                  <div className="d-flex justify-content-between align-items-center mb-3 px-2"></div>
+                  {deltaViewChart.series[0].data.length > 0 ||
+                  deltaViewChart.series[1].data.length > 0 ? (
+                    <Chart
+                      options={deltaViewChart.options}
+                      series={deltaViewChart.series}
+                      type="line"
+                      height={320}
+                    />
+                  ) : (
+                    <div className="text-center py-5 text-muted">
+                      No delta data available for the selected filters.
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           </Tab>
+
           <Tab eventKey="ForecastedDelta" title="Forecasted Delta">
             <p />
           </Tab>
+
           <Tab eventKey="SettledDelta" title="Settled Delta">
-            <p />
+            <div className="row g-2 mb-2">
+              <div className="col-12">
+                <div
+                  className="w-100 mb-2 global-cards mt-2"
+                  style={{ minHeight: "380px" }}
+                >
+                  <div className="d-flex justify-content-between align-items-center mb-3 px-2"></div>
+                  {settledDeltaChart.series[0].data.length > 0 ? (
+                    <Chart
+                      options={settledDeltaChart.options}
+                      series={settledDeltaChart.series}
+                      type="line"
+                      height={320}
+                    />
+                  ) : (
+                    <div className="text-center py-5 text-muted">
+                      No settled delta data available for the selected filters.
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           </Tab>
+
           <Tab eventKey="QuarterlyDelta" title="Static Quarterly Data">
             <p className="text-start global-font ms-2 mt-2 mb-1">
-              <strong>NOTE:</strong><br />
+              <strong>NOTE:</strong>
+              <br />
               1. The quarterly delta forecasts shown in table were finalized at
               the end of the previous quarter, based on prevailing market
               conditions and indicators. No revisions were made during the
               quarter.
               <br />
               2. June 2025 CRISIL actuals are not yet available. Therefore,
-              STATXO’s forecasted price for June has been used for Q2 (F)
+              STATXO's forecasted price for June has been used for Q2 (F)
               accuracy calculation and the Percent may slightly change once the
               actual price is available.
             </p>
