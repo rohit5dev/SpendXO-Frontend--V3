@@ -3,23 +3,58 @@ export const commodityOverviewData = {
     // HRC Price
     hrcPriceData: [
       // New forecasted data from the table (Jun 2025 onwards)
-      { date: "01-10-2026", forecasted_price: 52896.28 },
+      {
+        date: "01-10-2026",
+        forecasted_price: 52896.28,
+        best_buy_price: 52896.28,
+      },
       { date: "01-09-2026", forecasted_price: 52743.66 },
-      { date: "01-08-2026", forecasted_price: 52463.49 },
+      {
+        date: "01-08-2026",
+        forecasted_price: 52463.49,
+        best_buy_price: 52463.49,
+      },
       { date: "01-07-2026", forecasted_price: 52914.81 },
       { date: "01-06-2026", forecasted_price: 53844.69 },
-      { date: "01-05-2026", forecasted_price: 53777.32 },
+      {
+        date: "01-05-2026",
+        forecasted_price: 53777.32,
+        best_buy_price: 53777.32,
+      },
       { date: "01-04-2026", forecasted_price: 53806.82 },
       { date: "01-03-2026", forecasted_price: 53102.8 },
       { date: "01-02-2026", forecasted_price: 52593.72 },
-      { date: "01-01-2026", forecasted_price: 52183.4 },
-      { date: "01-12-2025", forecasted_price: 52541.54 },
+      {
+        date: "01-01-2026",
+        forecasted_price: 52183.4,
+        best_buy_price: 52183.4,
+      },
+      {
+        date: "01-12-2025",
+        forecasted_price: 52541.54,
+        best_buy_price: 52541.54,
+      },
       { date: "01-11-2025", forecasted_price: 53839.6 },
       { date: "01-10-2025", forecasted_price: 53405.69 },
       { date: "01-09-2025", forecasted_price: 53830.33 },
       { date: "01-08-2025", forecasted_price: 53635.25 },
-      { date: "01-07-2025", forecasted_price: 53616.9 },
-      { date: "01-06-2025", forecasted_price: 53692.77 },
+      {
+        date: "01-07-2025",
+        forecasted_price: 53616.9,
+        best_buy_price: 53616.9,
+      },
+      {
+        date: "01-06-2025",
+        forecasted_price: 53692.77,
+        best_buy_price: 53692.77,
+      },
+
+      // Your existing commented forecasted data (kept as reference)
+      // { date: "01-10-2025", forecasted_price: 52175.668 },
+      // { date: "01-09-2025", forecasted_price: 51942.684 },
+      // { date: "01-08-2025", forecasted_price: 51547.54 },
+      // { date: "01-07-2025", forecasted_price: 51769 },
+      // { date: "01-06-2025", forecasted_price: 53206.05 },
 
       // Historical data (May 2025 and earlier)
       { date: "01-05-2025", price: 53897 },
@@ -172,23 +207,47 @@ export const commodityOverviewData = {
 
     // CRC Price
     crcPriceData: [
-      // Forecasted data from the table (Jun 2025 onwards) - ALL data included
+      // Forecasted data from the table (Jun 2025 onwards) - ALL data included with best buy prices
       { date: "01-09-2026", forecasted_price: 60066.98 },
-      { date: "01-08-2026", forecasted_price: 59643.75 },
+      {
+        date: "01-08-2026",
+        forecasted_price: 59643.75,
+        best_buy_price: 59643.75,
+      },
       { date: "01-07-2026", forecasted_price: 60103.54 },
-      { date: "01-06-2026", forecasted_price: 61115.48 },
+      {
+        date: "01-06-2026",
+        forecasted_price: 61115.48,
+        best_buy_price: 61115.48,
+      },
       { date: "01-05-2026", forecasted_price: 61289.02 },
       { date: "01-04-2026", forecasted_price: 61492.59 },
       { date: "01-03-2026", forecasted_price: 60705.95 },
       { date: "01-02-2026", forecasted_price: 60266.47 },
-      { date: "01-01-2026", forecasted_price: 58817.85 },
-      { date: "01-12-2025", forecasted_price: 59918.96 },
+      {
+        date: "01-01-2026",
+        forecasted_price: 58817.85,
+        best_buy_price: 58817.85,
+      },
+      {
+        date: "01-12-2025",
+        forecasted_price: 59918.96,
+        best_buy_price: 59918.96,
+      },
       { date: "01-11-2025", forecasted_price: 61163.36 },
       { date: "01-10-2025", forecasted_price: 60653.93 },
       { date: "01-09-2025", forecasted_price: 61426.26 },
-      { date: "01-08-2025", forecasted_price: 61138.65 },
+      {
+        date: "01-08-2025",
+        forecasted_price: 61138.65,
+        best_buy_price: 61138.65,
+      },
       { date: "01-07-2025", forecasted_price: 61174.72 },
-      { date: "01-06-2025", forecasted_price: 61254.01 },
+      {
+        date: "01-06-2025",
+        forecasted_price: 61254.01,
+        best_buy_price: 61254.01,
+      },
 
       // Historical data (May 2025 and earlier)
       { date: "01-05-2025", price: 61400 },
@@ -15175,4 +15234,241 @@ export const commodityOverviewData = {
       sub_category: "Strong Domestic Demand",
     },
   ],
+
+  // KPIS Data
+  kpis: [
+    {
+      title: "Current Delta",
+      items: [
+        { label: "Month", value: "₹0.45 /Kg | May'25" },
+        { label: "Quarter", value: "₹1.90 | Apr–Jun'25" },
+      ],
+    },
+    {
+      title: "Next Delta (F)",
+      items: [
+        { label: "Month", value: "₹ -0.15 /Kg | Jun'25" },
+        { label: "Quarter", value: "₹0.17 | Jul–Sep'25" },
+      ],
+    },
+    {
+      title: "Accuracy",
+      items: [
+        { label: "Model", value: "May-25: 98.7%" },
+        { label: "Delta Difference", value: "May-25 : ₹0.81 /Kg" },
+      ],
+    },
+    {
+      title: "Data As Of",
+      items: [
+        { label: "Price", value: "May-25" },
+        { label: "News", value: "17-06-25" },
+      ],
+    },
+  ],
+  //Negotiation Levers Data
+  negotiationLeversData: [
+    {
+      quarter: "Q2-2025\n(Apr–Jun)",
+      activeScenario: "Base",
+      likelihood: "High",
+      activeDeltaRange: "₹1.1 to ₹1.2",
+      modelDelta: "₹ 1.14",
+      marketSentiment: "Stable",
+      keyDrivers:
+        "The sharp rise in HRC prices during Mar–Apr has plateaued. In June, mills held list prices flat despite muted demand. No new hikes were announced. While safeguard duty (12%) remains in effect, speculation of a 24% hike is building. Imports from SEA remain elevated, and the recent U.S. tariff hike on Chinese steel raises risk of regional oversupply.",
+      deltaTrend: [
+        "Trend 1: Safeguard duty effect has been fully priced in. Duty hike speculation from 12% to 24% is being used as a forward-looking justification by mills, but remains uncertain.",
+        "Trend 2: Imports remain elevated despite duty; Korea and Japan continue to supply actively.",
+        "Trend 3: U.S. doubling of tariffs on imported steel has raised risk of regional redirection and softening benchmarks.",
+        "Trend 4: Infrastructure and construction demand is seasonally suppressed, adding downward pressure on mill realizations.",
+      ],
+      negotiationStrategy: [
+        "Lever 1: Defer major buys to late June or July to capture downside from demand dip and import competition.",
+        "Lever 2: Do not accept duty hike arguments as fact — demand transparent, even-based pricing.",
+        "Lever 3: Benchmark against Korean/Japanese landed offers to enforce pricing discipline.",
+        "Lever 4: Use oversupply signals (China redirection + SEA pricing) to push for short-term flexible rate bands.",
+      ],
+    },
+    {
+      quarter: "Q1-2025\n(Jan–Mar)",
+      activeScenario: "Upside",
+      likelihood: "High",
+      activeDeltaRange: "₹2.0 to ₹2.5",
+      modelDelta: "₹ 3.35",
+      marketSentiment: "Negative",
+      keyDrivers:
+        "Safeguard duty anticipation and resilient domestic demand outweigh raw material cost softness, supporting firm pricing into March.",
+      deltaTrend: [
+        "Trend 1: Steel prices faced slight downward pressure in January–February driven by weak demand and increased import inflows.",
+        "Trend 2: From March onwards, mills firmed pricing due to safeguard duty anticipation and expected tightening of global supply.",
+      ],
+      negotiationStrategy: [
+        "Lever 1: Leverage early-quarter import oversupply and lower raw material costs to secure favorable deals.",
+        "Lever 2: Push back against any speculative price hikes tied to an unconfirmed safeguard policy.",
+        "Lever 3: Secure strategic volumes cautiously before full safeguard duty confirmation to mitigate late-quarter price firming risks.",
+      ],
+    },
+  ],
+
+  //
+
+  staticQuarterlyData: {
+    // ---------- CRC Data ----------
+    crc: [
+      {
+        year: "2025",
+        quarter: "Q1 (A)",
+        month: "Jan-Mar",
+        statxoForecastedQuarterlyDelta: "",
+        crisilActualQuarterlyDelta: "₹2.58",
+        deltaDifference: "",
+        accuracy: "",
+        forecastFrozenIn: "",
+      },
+      {
+        year: "2025",
+        quarter: "Q2 (F)",
+        month: "Apr-Jun*",
+        statxoForecastedQuarterlyDelta: "₹1.72",
+        crisilActualQuarterlyDelta: "₹2.05",
+        deltaDifference: "0.33",
+        accuracy: "84%",
+        forecastFrozenIn: "March, 2025",
+      },
+      {
+        year: "2025",
+        quarter: "Q3 (F)",
+        month: "Jul-Sep",
+        statxoForecastedQuarterlyDelta: "₹0.17",
+        crisilActualQuarterlyDelta: "",
+        deltaDifference: "",
+        accuracy: "",
+        forecastFrozenIn: "May, 2025",
+      },
+      {
+        year: "2025",
+        quarter: "Q4 (F)",
+        month: "Oct-Dec",
+        statxoForecastedQuarterlyDelta: "-₹1.51",
+        crisilActualQuarterlyDelta: "",
+        deltaDifference: "",
+        accuracy: "",
+        forecastFrozenIn: "May, 2025",
+      },
+      {
+        year: "2026",
+        quarter: "Q1 (F)",
+        month: "Jan-Mar",
+        statxoForecastedQuarterlyDelta: "₹0.79",
+        crisilActualQuarterlyDelta: "",
+        deltaDifference: "",
+        accuracy: "",
+        forecastFrozenIn: "May, 2025",
+      },
+      {
+        year: "2026",
+        quarter: "Q2 (F)",
+        month: "Apr-Jun",
+        statxoForecastedQuarterlyDelta: "₹0.41",
+        crisilActualQuarterlyDelta: "",
+        deltaDifference: "",
+        accuracy: "",
+        forecastFrozenIn: "May, 2025",
+      },
+      {
+        year: "2026",
+        quarter: "Q3 (F)",
+        month: "Jul-Sep",
+        statxoForecastedQuarterlyDelta: "₹1.05",
+        crisilActualQuarterlyDelta: "",
+        deltaDifference: "",
+        accuracy: "",
+        forecastFrozenIn: "May, 2025",
+      },
+    ],
+    // ---------- HRC Data ----------
+    hrc: [
+      {
+        year: "2025",
+        quarter: "Q1 (A)",
+        month: "Jan-Mar",
+        statxoForecastedQuarterlyDelta: "",
+        crisilActualQuarterlyDelta: "₹3.35",
+        deltaDifference: "",
+        accuracy: "",
+        forecastFrozenIn: "",
+      },
+      {
+        year: "2025",
+        quarter: "Q2 (F)",
+        month: "Apr-Jun*",
+        statxoForecastedQuarterlyDelta: "₹1.38",
+        crisilActualQuarterlyDelta: "₹1.14",
+        deltaDifference: "0.24",
+        accuracy: "79%",
+        forecastFrozenIn: "March, 2025",
+      },
+      {
+        year: "2025",
+        quarter: "Q3 (F)",
+        month: "Jul-Sep",
+        statxoForecastedQuarterlyDelta: "₹0.14",
+        crisilActualQuarterlyDelta: "",
+        deltaDifference: "",
+        accuracy: "",
+        forecastFrozenIn: "May, 2025",
+      },
+      {
+        year: "2025",
+        quarter: "Q4 (F)",
+        month: "Oct-Dec",
+        statxoForecastedQuarterlyDelta: "-₹1.29",
+        crisilActualQuarterlyDelta: "",
+        deltaDifference: "",
+        accuracy: "",
+        forecastFrozenIn: "May, 2025",
+      },
+      {
+        year: "2026",
+        quarter: "Q1 (F)",
+        month: "Jan-Mar",
+        statxoForecastedQuarterlyDelta: "₹0.56",
+        crisilActualQuarterlyDelta: "",
+        deltaDifference: "",
+        accuracy: "",
+        forecastFrozenIn: "May, 2025",
+      },
+      {
+        year: "2026",
+        quarter: "Q2 (F)",
+        month: "Apr-Jun",
+        statxoForecastedQuarterlyDelta: "₹0.74",
+        crisilActualQuarterlyDelta: "",
+        deltaDifference: "",
+        accuracy: "",
+        forecastFrozenIn: "May, 2025",
+      },
+      {
+        year: "2026",
+        quarter: "Q3 (F)",
+        month: "Jul-Sep",
+        statxoForecastedQuarterlyDelta: "-₹1.10",
+        crisilActualQuarterlyDelta: "",
+        deltaDifference: "",
+        accuracy: "",
+        forecastFrozenIn: "May, 2025",
+      },
+      {
+        year: "2026",
+        quarter: "Q4 (F)",
+        month: "Oct-Dec",
+        statxoForecastedQuarterlyDelta: "₹0.15",
+        crisilActualQuarterlyDelta: "",
+        deltaDifference: "",
+        accuracy: "",
+        forecastFrozenIn: "May, 2025",
+      },
+    ],
+  },
 };

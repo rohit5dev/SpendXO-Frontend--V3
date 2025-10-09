@@ -4,19 +4,20 @@ import { Dropdown } from "react-bootstrap";
 import "../css/CommodityIntelligenceNew.css";
 import "leaflet/dist/leaflet.css";
 import { commodityOverviewData } from "../Data/overviewData";
-import { Tabs, Tab, Form } from "react-bootstrap"; // Import Form for the switch
+import { Tabs, Tab, Form } from "react-bootstrap";
 
 const OverviewTab = () => {
   // Tabs
   const [activeChartTab, setActiveChartTab] = useState("PriceTrend");
 
-  // others
+  // Global filters
+  const [globalSelectedCommodity, setGlobalSelectedCommodity] =
+    useState("hrcPriceData");
+  const [globalSelectedYear, setGlobalSelectedYear] = useState("All Years");
+
+  // Chart specific filter
   const [forecastingDataBasis, setForecastingDataBasis] =
     useState("Monthly Data");
-  const [forecastingSelectedYear, setForecastingSelectedYear] =
-    useState("All Years");
-  const [forecastingSelectedCommodity, setForecastingSelectedCommodity] =
-    useState("hrcPriceData");
 
   // State for selected news (for card display)
   const [forecastingSelectedNews, setForecastingSelectedNews] = useState([]);
@@ -51,6 +52,8 @@ const OverviewTab = () => {
         quarterlyData.push({
           Date: quarterData[quarterData.length - 1].Date,
           HRC_Price: avgPrice,
+          isForecasted: quarterData[quarterData.length - 1].isForecasted,
+          best_buy_price: quarterData[quarterData.length - 1].best_buy_price,
         });
       }
       return quarterlyData;
@@ -61,7 +64,12 @@ const OverviewTab = () => {
       selectedData.forEach((item) => {
         const year = forecastingParseDate(item.Date || item.date).getFullYear();
         if (!yearMap[year]) {
-          yearMap[year] = { total: 0, count: 0 };
+          yearMap[year] = {
+            total: 0,
+            count: 0,
+            isForecasted: item.isForecasted,
+            best_buy_price: item.best_buy_price,
+          };
         }
         yearMap[year].total += item.HRC_Price || item.price || 0;
         yearMap[year].count += 1;
@@ -71,6 +79,8 @@ const OverviewTab = () => {
         yearlyData.push({
           Date: `31-12-${year}`,
           HRC_Price: yearMap[year].total / yearMap[year].count,
+          isForecasted: yearMap[year].isForecasted,
+          best_buy_price: yearMap[year].best_buy_price,
         });
       }
 
@@ -87,20 +97,19 @@ const OverviewTab = () => {
 
   // Dynamic y-axis and legend name based on selected commodity
   const forecastingYAxisTitle =
-    forecastingSelectedCommodity === "hrcPriceData"
+    globalSelectedCommodity === "hrcPriceData"
       ? "HRC Price (INR/Tonne)"
       : "CRC Price (INR/Tonne)";
   const forecastingLegendName =
-    forecastingSelectedCommodity === "hrcPriceData" ? "HRC Price" : "CRC Price";
+    globalSelectedCommodity === "hrcPriceData" ? "HRC Price" : "CRC Price";
 
   // Extract unique years from selected commodity data
   const forecastingUniqueYears = [
     "All Years",
     ...new Set(
       (
-        commodityOverviewData.commodityPricingData[
-          forecastingSelectedCommodity
-        ] || []
+        commodityOverviewData.commodityPricingData[globalSelectedCommodity] ||
+        []
       ).map((item) => forecastingParseDate(item.date).getFullYear())
     ),
   ];
@@ -116,16 +125,16 @@ const OverviewTab = () => {
 
   // Prepare filtered data for chart - SEPARATE historical and forecasted data
   const commodityData =
-    commodityOverviewData.commodityPricingData[forecastingSelectedCommodity] ||
-    [];
+    commodityOverviewData.commodityPricingData[globalSelectedCommodity] || [];
 
-  // Separate historical and forecasted data
+  // Separate historical and forecasted data with best buy prices
   const historicalData = commodityData
     .filter((item) => item.price !== undefined)
     .map((item) => ({
       Date: item.date,
       HRC_Price: item.price,
       isForecasted: false,
+      best_buy_price: item.best_buy_price,
     }))
     .sort(
       (a, b) => forecastingParseDate(a.Date) - forecastingParseDate(b.Date)
@@ -137,6 +146,7 @@ const OverviewTab = () => {
       Date: item.date,
       HRC_Price: item.forecasted_price,
       isForecasted: true,
+      best_buy_price: item.best_buy_price,
     }))
     .sort(
       (a, b) => forecastingParseDate(a.Date) - forecastingParseDate(b.Date)
@@ -146,13 +156,53 @@ const OverviewTab = () => {
   const allCommodityData = [...historicalData, ...forecastedData];
   const forecastingFilteredCommodityData = forecastingFilterDataByYear(
     allCommodityData,
-    forecastingSelectedYear
+    globalSelectedYear
   ).sort((a, b) => forecastingParseDate(a.Date) - forecastingParseDate(b.Date));
 
   const forecastingFilteredChartData = forecastingFilterDataByBasis(
     forecastingDataBasis,
     forecastingFilteredCommodityData
   );
+
+  // Filter KPIs data based on global selections
+  const filteredKPIs = React.useMemo(() => {
+    const baseKPIs = commodityOverviewData.kpis || [];
+
+    // Filter KPIs based on selected commodity and year
+    return baseKPIs.map((kpi) => {
+      if (globalSelectedCommodity === "hrcPriceData") {
+        // Return HRC specific KPIs or all if not commodity specific
+        return kpi;
+      } else {
+        // Return CRC specific KPIs or adjust values for CRC
+        return {
+          ...kpi,
+          // You can modify KPI values based on commodity if needed
+          items: kpi.items.map((item) => ({
+            ...item,
+            // Example: Adjust values for CRC if different from HRC
+            // value: item.value.replace("HRC", "CRC") // if values contain commodity names
+          })),
+        };
+      }
+    });
+  }, [globalSelectedCommodity, globalSelectedYear]);
+
+  // Filter negotiation levers data based on global selections
+  const filteredNegotiationLevers = React.useMemo(() => {
+    const baseLevers = commodityOverviewData.negotiationLeversData || [];
+
+    // Filter or adjust negotiation levers based on selected commodity
+    if (globalSelectedCommodity === "hrcPriceData") {
+      return baseLevers.filter(
+        (lever) => !lever.quarter.includes("CRC") // Keep HRC specific or general levers
+      );
+    } else {
+      return baseLevers.filter(
+        (lever) => !lever.quarter.includes("HRC") // Keep CRC specific or general levers
+      );
+    }
+  }, [globalSelectedCommodity]);
 
   // Separate filtered data into historical and forecasted for chart rendering
   const historicalChartData = forecastingFilteredChartData.filter(
@@ -254,7 +304,7 @@ const OverviewTab = () => {
     [forecastingFilteredChartData]
   );
 
-  // CHART OPTIONS - Updated to handle multiple series
+  // CHART OPTIONS - Updated to include best buy price markers
   const forecastingOptionsHRC = React.useMemo(
     () => ({
       chart: {
@@ -275,11 +325,19 @@ const OverviewTab = () => {
       },
       stroke: {
         curve: "smooth",
-        width: [2, 2, 2, 2],
-        dashArray: [0, 0, 2, 0], // only forecasted line is dotted
-        colors: ["#38858e", "#38858e", "#db3f3fff", "#ffcdcdff"],
+        width: [2, 2, 2, 2, 0], // No stroke for scatter points
+        dashArray: [0, 0, 2, 0, 0], // only forecasted line is dotted
+        colors: ["#38858e", "#4ac7d4ff", "#db3f3fff", "#ffcdcdff", "#00FF00"],
       },
-
+      markers: {
+        size: [0, 0, 0, 0, 6], // Only show markers for best buy prices
+        colors: ["#38858e", "#4ac7d4ff", "#db3f3fff", "#ffcdcdff", "#00FF00"],
+        strokeColors: "#fff",
+        strokeWidth: 2,
+        hover: {
+          size: 8,
+        },
+      },
       xaxis: {
         categories: forecastingFilteredChartData.map((item) =>
           forecastingFormatXAxisLabel(item.Date, forecastingDataBasis)
@@ -323,6 +381,7 @@ const OverviewTab = () => {
             const date = dataPoint?.Date;
             const price = dataPoint?.HRC_Price;
             const isForecasted = dataPoint?.isForecasted;
+            const bestBuyPrice = dataPoint?.best_buy_price;
 
             if (!date || price === undefined) {
               return "<div style='padding:8px 12px'>Invalid data</div>";
@@ -339,6 +398,11 @@ const OverviewTab = () => {
                 ? '<span style="color:#ff6b6b;">(Forecasted)</span>'
                 : ""
             }</span>`;
+
+            // Add best buy price to tooltip if available
+            if (bestBuyPrice !== undefined) {
+              tooltipHtml += `<br/><span style="color:#00AA00; font-weight:bold;">Best Buy Price: ₹${bestBuyPrice.toLocaleString()}/Tonne</span>`;
+            }
 
             if (newsList && newsList.length > 0) {
               tooltipHtml += `<hr style="margin:6px 0"/><div style="max-width:500px">`;
@@ -415,12 +479,16 @@ const OverviewTab = () => {
       legend: {
         show: true,
         showForSingleSeries: false,
-        customLegendItems: ["Historical Data", "Forecasted Data"],
+        customLegendItems: [
+          "Historical Data",
+          "Forecasted Data",
+          "Best Buy Price",
+        ],
         markers: {
-          fillColors: ["#38858e", "#ff6b6b"],
+          fillColors: ["#38858e", "#ff6b6b", "#00FF00"],
         },
       },
-      colors: ["#38858e", "#38858e", "#ff6b6b", "#ff6b6b"], // Consistent colors for all series
+      colors: ["#38858e", "#38858e", "#ff6b6b", "#ff6b6b", "#00FF00"],
       responsive: [
         {
           breakpoint: 768,
@@ -438,14 +506,14 @@ const OverviewTab = () => {
     [
       forecastingFilteredChartData,
       forecastingDataBasis,
-      forecastingSelectedCommodity,
+      globalSelectedCommodity,
       forecastingHandleChartClick,
       forecastingYAxisTitle,
       forecastingLegendName,
     ]
   );
 
-  // CHART SERIES - Four series: historical line, historical bar, forecasted line, forecasted bar
+  // CHART SERIES - Five series: historical line, historical bar, forecasted line, forecasted bar, best buy prices
   const forecastingChartSeries = React.useMemo(() => {
     // Create arrays with null values for the gaps between series
     const historicalLineData = forecastingFilteredChartData.map((item) =>
@@ -462,6 +530,11 @@ const OverviewTab = () => {
 
     const forecastedBarData = forecastingFilteredChartData.map((item) =>
       !item.isForecasted ? null : item.HRC_Price
+    );
+
+    // Best buy price data as scatter points
+    const bestBuyPriceSeries = forecastingFilteredChartData.map((item) =>
+      item.best_buy_price !== undefined ? item.best_buy_price : null
     );
 
     return [
@@ -487,13 +560,24 @@ const OverviewTab = () => {
         data: forecastedBarData,
         showInLegend: false,
       },
+      {
+        name: "Best Buy Price",
+        type: "scatter",
+        data: bestBuyPriceSeries,
+      },
     ];
   }, [forecastingFilteredChartData]);
 
   const forecastingResetFiltersForecastChart = () => {
     setForecastingDataBasis("Monthly Data");
-    setForecastingSelectedYear("All Years");
-    setForecastingSelectedCommodity("hrcPriceData");
+    setForecastingSelectedNews([]);
+    setForecastingSelectedNewsDate(null);
+  };
+
+  const globalResetFilters = () => {
+    setGlobalSelectedCommodity("hrcPriceData");
+    setGlobalSelectedYear("All Years");
+    setForecastingDataBasis("Monthly Data");
     setForecastingSelectedNews([]);
     setForecastingSelectedNewsDate(null);
   };
@@ -513,89 +597,60 @@ const OverviewTab = () => {
         )}`
       : "All News";
 
-  // KPIS Data
-  const kpis = [
-    {
-      title: "Current Delta",
-      items: [
-        { label: "Month", value: "₹0.45 /Kg | May'25" },
-        { label: "Quarter", value: "₹1.90 | Apr–Jun'25" },
-      ],
-    },
-    {
-      title: "Next Delta (F)",
-      items: [
-        { label: "Month", value: "₹ -0.15 /Kg | Jun'25" },
-        { label: "Quarter", value: "₹0.17 | Jul–Sep'25" },
-      ],
-    },
-    {
-      title: "Accuracy",
-      items: [
-        { label: "Model", value: "May-25: 98.7%" },
-        { label: "Delta Difference", value: "May-25 : ₹0.81 /Kg" },
-      ],
-    },
-    {
-      title: "Data As Of",
-      items: [
-        { label: "Price", value: "May-25" },
-        { label: "News", value: "17-06-25" },
-      ],
-    },
-  ];
-
-  // table data
-  // Data structure based on the image
-  const negotiationLeversData = [
-    {
-      quarter: "Q2-2025\n(Apr–Jun)",
-      activeScenario: "Base",
-      likelihood: "High",
-      activeDeltaRange: "₹1.1 to ₹1.2",
-      modelDelta: "₹ 1.14",
-      marketSentiment: "Stable",
-      keyDrivers:
-        "The sharp rise in HRC prices during Mar–Apr has plateaued. In June, mills held list prices flat despite muted demand. No new hikes were announced. While safeguard duty (12%) remains in effect, speculation of a 24% hike is building. Imports from SEA remain elevated, and the recent U.S. tariff hike on Chinese steel raises risk of regional oversupply.",
-      deltaTrend: [
-        "Trend 1: Safeguard duty effect has been fully priced in. Duty hike speculation from 12% to 24% is being used as a forward-looking justification by mills, but remains uncertain.",
-        "Trend 2: Imports remain elevated despite duty; Korea and Japan continue to supply actively.",
-        "Trend 3: U.S. doubling of tariffs on imported steel has raised risk of regional redirection and softening benchmarks.",
-        "Trend 4: Infrastructure and construction demand is seasonally suppressed, adding downward pressure on mill realizations.",
-      ],
-      negotiationStrategy: [
-        "Lever 1: Defer major buys to late June or July to capture downside from demand dip and import competition.",
-        "Lever 2: Do not accept duty hike arguments as fact — demand transparent, even-based pricing.",
-        "Lever 3: Benchmark against Korean/Japanese landed offers to enforce pricing discipline.",
-        "Lever 4: Use oversupply signals (China redirection + SEA pricing) to push for short-term flexible rate bands.",
-      ],
-    },
-    {
-      quarter: "Q1-2025\n(Jan–Mar)",
-      activeScenario: "Upside",
-      likelihood: "High",
-      activeDeltaRange: "₹2.0 to ₹2.5",
-      modelDelta: "₹ 3.35",
-      marketSentiment: "Negative",
-      keyDrivers:
-        "Safeguard duty anticipation and resilient domestic demand outweigh raw material cost softness, supporting firm pricing into March.",
-      deltaTrend: [
-        "Trend 1: Steel prices faced slight downward pressure in January–February driven by weak demand and increased import inflows.",
-        "Trend 2: From March onwards, mills firmed pricing due to safeguard duty anticipation and expected tightening of global supply.",
-      ],
-      negotiationStrategy: [
-        "Lever 1: Leverage early-quarter import oversupply and lower raw material costs to secure favorable deals.",
-        "Lever 2: Push back against any speculative price hikes tied to an unconfirmed safeguard policy.",
-        "Lever 3: Secure strategic volumes cautiously before full safeguard duty confirmation to mitigate late-quarter price firming risks.",
-      ],
-    },
-  ];
-
   return (
     <div className="commodity-data mt-2">
+      {/* ################# GLOBAL FILTERS #################### */}
+      <div className="global-cards mb-3">
+        <div className="d-flex justify-content-between align-items-center">
+          <p className="head-theme mb-0">Global Filters</p>
+          <div className="d-flex gap-2 align-items-center">
+            {/* Commodity Filter */}
+            <Dropdown
+              onSelect={(key) => {
+                setGlobalSelectedCommodity(key);
+              }}
+            >
+              <Dropdown.Toggle variant="light" size="sm">
+                {forecastingCommodityOptions.find(
+                  (c) => c.key === globalSelectedCommodity
+                )?.label || "Select Commodity"}
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                {forecastingCommodityOptions.map((commodity) => (
+                  <Dropdown.Item key={commodity.key} eventKey={commodity.key}>
+                    {commodity.label}
+                  </Dropdown.Item>
+                ))}
+              </Dropdown.Menu>
+            </Dropdown>
+
+            {/* Year Filter */}
+            <Dropdown onSelect={(key) => setGlobalSelectedYear(key)}>
+              <Dropdown.Toggle variant="light" size="sm">
+                {globalSelectedYear}
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                {forecastingUniqueYears.map((year, index) => (
+                  <Dropdown.Item key={index} eventKey={year}>
+                    {year}
+                  </Dropdown.Item>
+                ))}
+              </Dropdown.Menu>
+            </Dropdown>
+
+            <button
+              className="btn btn-theme global-font"
+              onClick={globalResetFilters}
+            >
+              Reset All
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* ################# KPIs #################### */}
       <div className="d-flex gap-2 flex-wrap w-100">
-        {kpis.map((card, index) => (
+        {filteredKPIs.map((card, index) => (
           <div
             key={index}
             className="global-cards p-2 flex-fill"
@@ -624,188 +679,273 @@ const OverviewTab = () => {
       </div>
 
       {/* Charts Section */}
-      <Tabs
-        activeKey={activeChartTab}
-        onSelect={(key) => setActiveChartTab(key)}
-        className="global-tabs"
-        style={{ width: "100%" }}
-      >
-        <Tab eventKey="PriceTrend" title="Price Trend">
-          <div className="row g-2 mb-2">
-            <div className="col-9">
-              <div
-                className="w-100 mb-2 global-cards mt-2"
-                style={{ minHeight: "380px" }}
-                ref={forecastingChartContainerRef}
-              >
-                <div className="d-flex justify-content-between align-items-center mb-3 px-2">
-                  <p className="head-theme">Price Trend</p>
-                  <div className="d-flex gap-2">
-                    {/* Commodity Filter */}
-                    <Dropdown
-                      onSelect={(key) => {
-                        setForecastingSelectedCommodity(key);
-                        setForecastingSelectedYear("All Years");
-                      }}
-                    >
-                      <Dropdown.Toggle variant="light" size="sm">
-                        {forecastingCommodityOptions.find(
-                          (c) => c.key === forecastingSelectedCommodity
-                        )?.label || "Select Commodity"}
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        {forecastingCommodityOptions.map((commodity) => (
-                          <Dropdown.Item
-                            key={commodity.key}
-                            eventKey={commodity.key}
-                          >
-                            {commodity.label}
-                          </Dropdown.Item>
-                        ))}
-                      </Dropdown.Menu>
-                    </Dropdown>
-                    {/* Year Filter */}
-                    <Dropdown
-                      onSelect={(key) => setForecastingSelectedYear(key)}
-                    >
-                      <Dropdown.Toggle variant="light" size="sm">
-                        {forecastingSelectedYear}
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        {forecastingUniqueYears.map((year, index) => (
-                          <Dropdown.Item key={index} eventKey={year}>
-                            {year}
-                          </Dropdown.Item>
-                        ))}
-                      </Dropdown.Menu>
-                    </Dropdown>
-                    {/* Data Basis Filter */}
-                    <Dropdown onSelect={(key) => setForecastingDataBasis(key)}>
-                      <Dropdown.Toggle variant="light" size="sm">
-                        {forecastingDataBasis}
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item eventKey="Monthly Data">
-                          Monthly Data
-                        </Dropdown.Item>
-                        <Dropdown.Item eventKey="Quarterly Data">
-                          Quarterly Data
-                        </Dropdown.Item>
-                        <Dropdown.Item eventKey="Yearly Data">
-                          Yearly Data
-                        </Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                    <button
-                      className="btn btn-theme global-font"
-                      onClick={forecastingResetFiltersForecastChart}
-                    >
-                      Reset
-                    </button>
-                  </div>
-                </div>
-                {forecastingFilteredChartData &&
-                forecastingFilteredChartData.length > 0 ? (
-                  <div
-                    key={`${forecastingSelectedCommodity}-${forecastingSelectedYear}-${forecastingDataBasis}`}
-                  >
-                    <Chart
-                      ref={forecastingChartRef}
-                      options={forecastingOptionsHRC}
-                      series={forecastingChartSeries}
-                      type="line"
-                      height={320}
-                    />
-                  </div>
-                ) : (
-                  <div className="text-center py-5 text-muted">
-                    No data available for the selected filters.
-                  </div>
-                )}
-              </div>
-            </div>
-            <div className="col-3">
-              {/* News Card Display */}
-              <div
-                className="news-card mt-2 pt-3 global-cards text-start"
-                style={{
-                  height: 400,
-                  overflowY: "auto",
-                  backgroundColor: "rgba(255, 255, 255, 0.62)",
-                }}
-              >
-                <p className="head-theme">{forecastingNewsTitle}</p>
-                <div>
-                  {forecastingNewsToShow.map((x, idx) => (
-                    <div
-                      key={idx}
-                      className="news-item d-flex flex-column justify-content-start text-start mt-2"
-                    >
-                      <div
-                        className="global-dashed-card d-flex flex-column justify-content-between rounded-4 p-2 mt-1 text-start position-relative"
-                        style={{
-                          cursor: "pointer",
-                          backgroundColor: "rgb(245, 245, 245)",
-                        }}
-                        onClick={() => {
-                          window.open(x.url, "_blank");
-                        }}
+      <div className="global-cards my-2">
+        <Tabs
+          activeKey={activeChartTab}
+          onSelect={(key) => setActiveChartTab(key)}
+          className="global-tabs"
+          style={{ width: "100%" }}
+        >
+          <Tab eventKey="PriceTrend" title="Price Trend">
+            <div className="row g-2 mb-2">
+              <div className="col-9">
+                <div
+                  className="w-100 mb-2 global-cards mt-2"
+                  style={{ minHeight: "380px" }}
+                  ref={forecastingChartContainerRef}
+                >
+                  <div className="d-flex justify-content-between align-items-center mb-3 px-2">
+                    <p className="head-theme">
+                      Price Trend -{" "}
+                      {
+                        forecastingCommodityOptions.find(
+                          (c) => c.key === globalSelectedCommodity
+                        )?.label
+                      }
+                    </p>
+                    <div className="d-flex gap-2">
+                      {/* Data Basis Filter - Only this remains in chart */}
+                      <Dropdown
+                        onSelect={(key) => setForecastingDataBasis(key)}
                       >
-                        <p className=" mb-1 p-0 global-font ">{x.category}</p>
-                        <p
-                          className="fw-bold m-0 mb-2 p-0 global-font "
-                          style={{ color: "var(--color-main)" }}
-                        >
-                          {x.title}
-                        </p>
-                        <p className="global-font p-0 m-0 text-secondary">
-                          Released on {x.published}
-                        </p>
-                        <p
-                          className="position-absolute bottom-0 end-0 text-center px-2 global-font rounded-2 m-2"
+                        <Dropdown.Toggle variant="light" size="sm">
+                          {forecastingDataBasis}
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                          <Dropdown.Item eventKey="Monthly Data">
+                            Monthly Data
+                          </Dropdown.Item>
+                          <Dropdown.Item eventKey="Quarterly Data">
+                            Quarterly Data
+                          </Dropdown.Item>
+                          <Dropdown.Item eventKey="Yearly Data">
+                            Yearly Data
+                          </Dropdown.Item>
+                        </Dropdown.Menu>
+                      </Dropdown>
+                      <button
+                        className="btn btn-theme global-font"
+                        onClick={forecastingResetFiltersForecastChart}
+                      >
+                        Reset Chart
+                      </button>
+                    </div>
+                  </div>
+                  {forecastingFilteredChartData &&
+                  forecastingFilteredChartData.length > 0 ? (
+                    <div
+                      key={`${globalSelectedCommodity}-${globalSelectedYear}-${forecastingDataBasis}`}
+                    >
+                      <Chart
+                        ref={forecastingChartRef}
+                        options={forecastingOptionsHRC}
+                        series={forecastingChartSeries}
+                        type="line"
+                        height={320}
+                      />
+                    </div>
+                  ) : (
+                    <div className="text-center py-5 text-muted">
+                      No data available for the selected filters.
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="col-3">
+                {/* News Card Display */}
+                <div
+                  className="news-card mt-2 pt-3 global-cards text-start"
+                  style={{
+                    height: 400,
+                    overflowY: "auto",
+                    backgroundColor: "rgba(255, 255, 255, 0.62)",
+                  }}
+                >
+                  <p className="head-theme">{forecastingNewsTitle}</p>
+                  <div>
+                    {forecastingNewsToShow.map((x, idx) => (
+                      <div
+                        key={idx}
+                        className="news-item d-flex flex-column justify-content-start text-start mt-2"
+                      >
+                        <div
+                          className="global-dashed-card d-flex flex-column justify-content-between rounded-4 p-2 mt-1 text-start position-relative"
                           style={{
-                            background:
-                              x.sentiment_score === 0
-                                ? "var(--color-bg-yellow)"
-                                : x.sentiment_score === 1
-                                ? "var(--color-bg-green)"
-                                : "var(--color-bg-red)",
-                            width: "130px",
+                            cursor: "pointer",
+                            backgroundColor: "rgb(245, 245, 245)",
+                          }}
+                          onClick={() => {
+                            window.open(x.url, "_blank");
                           }}
                         >
-                          {x.sentiment_score === 0
-                            ? "Neutral"
-                            : x.sentiment_score === 1
-                            ? "Positive"
-                            : "Negative"}{" "}
-                          Sentiment
-                        </p>
+                          <p className=" mb-1 p-0 global-font ">{x.category}</p>
+                          <p
+                            className="fw-bold m-0 mb-2 p-0 global-font "
+                            style={{ color: "var(--color-main)" }}
+                          >
+                            {x.title}
+                          </p>
+                          <p className="global-font p-0 m-0 text-secondary">
+                            Released on {x.published}
+                          </p>
+                          <p
+                            className="position-absolute bottom-0 end-0 text-center px-2 global-font rounded-2 m-2"
+                            style={{
+                              background:
+                                x.sentiment_score === 0
+                                  ? "var(--color-bg-yellow)"
+                                  : x.sentiment_score === 1
+                                  ? "var(--color-bg-green)"
+                                  : "var(--color-bg-red)",
+                              width: "130px",
+                            }}
+                          >
+                            {x.sentiment_score === 0
+                              ? "Neutral"
+                              : x.sentiment_score === 1
+                              ? "Positive"
+                              : "Negative"}{" "}
+                            Sentiment
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </Tab>
-        <Tab eventKey="DeltaView" title="Delta View">
-          <p />
-        </Tab>
-        <Tab eventKey="ForecastedDelta" title="Forecasted Delta">
-          <p />
-        </Tab>
-        <Tab eventKey="SettledDelta" title="Settled Delta">
-          <p />
-        </Tab>
-        <Tab eventKey="QuarterlyDelta" title="Static Quarterly Delta">
-          <p />
-        </Tab>
-      </Tabs>
+          </Tab>
+          <Tab eventKey="DeltaView" title="Delta View">
+            <p />
+          </Tab>
+          <Tab eventKey="ForecastedDelta" title="Forecasted Delta">
+            <p />
+          </Tab>
+          <Tab eventKey="SettledDelta" title="Settled Delta">
+            <p />
+          </Tab>
+          <Tab eventKey="QuarterlyDelta" title="Static Quarterly Data">
+            <p className="text-start global-font ms-2 mt-2 mb-1">
+              <strong>NOTE:</strong><br />
+              1. The quarterly delta forecasts shown in table were finalized at
+              the end of the previous quarter, based on prevailing market
+              conditions and indicators. No revisions were made during the
+              quarter.
+              <br />
+              2. June 2025 CRISIL actuals are not yet available. Therefore,
+              STATXO’s forecasted price for June has been used for Q2 (F)
+              accuracy calculation and the Percent may slightly change once the
+              actual price is available.
+            </p>
 
+            <div className="table-container mb-2">
+              <table className="table table-bordered table-sm m-0">
+                <thead>
+                  <tr>
+                    <th className="text-start defaultStyleHead">Year</th>
+                    <th className="text-start defaultStyleHead">Quarter</th>
+                    <th className="text-start defaultStyleHead">Month</th>
+                    <th className="text-start defaultStyleHead">
+                      Statxo Forecasted Quarterly Delta
+                    </th>
+                    <th className="text-start defaultStyleHead">
+                      CRISIL Actual Quarterly Delta
+                    </th>
+                    <th className="text-start defaultStyleHead">
+                      Delta Difference
+                    </th>
+                    <th className="text-start defaultStyleHead">Accuracy</th>
+                    <th className="text-start defaultStyleHead">
+                      Forecast Frozen In
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(() => {
+                    // Map global commodity keys to staticQuarterlyData keys
+                    const commodityKeyMap = {
+                      hrcPriceData: "hrc",
+                      crcPriceData: "crc",
+                    };
+
+                    const staticData =
+                      commodityOverviewData.staticQuarterlyData || {};
+
+                    const selectedKey =
+                      commodityKeyMap[globalSelectedCommodity] ||
+                      // fall back to hrc if nothing matches
+                      "hrc";
+
+                    let quarterlyArray = staticData[selectedKey] || [];
+
+                    // Apply global year filter if a specific year is selected
+                    if (
+                      globalSelectedYear &&
+                      globalSelectedYear !== "All Years"
+                    ) {
+                      quarterlyArray = quarterlyArray.filter(
+                        (d) => String(d.year) === String(globalSelectedYear)
+                      );
+                    }
+
+                    // Render rows; if no rows, show a placeholder
+                    if (!quarterlyArray || quarterlyArray.length === 0) {
+                      return (
+                        <tr>
+                          <td className="defaultStyles" colSpan={8}>
+                            No quarterly data available for the selected
+                            filters.
+                          </td>
+                        </tr>
+                      );
+                    }
+
+                    return quarterlyArray.map((data, index) => (
+                      <tr key={`${selectedKey}-${index}`}>
+                        <td className="defaultStyles">{data.year}</td>
+                        <td className="defaultStyles">{data.quarter}</td>
+                        <td className="defaultStyles">{data.month}</td>
+                        <td className="defaultStyles">
+                          {data.statxoForecastedQuarterlyDelta}
+                        </td>
+                        <td className="defaultStyles">
+                          {data.crisilActualQuarterlyDelta || "-"}
+                        </td>
+                        <td className="defaultStyles">
+                          {data.deltaDifference || "-"}
+                        </td>
+                        <td className="defaultStyles">
+                          {data.accuracy ? (
+                            <span className="badge bg-success">
+                              {data.accuracy}
+                            </span>
+                          ) : (
+                            "-"
+                          )}
+                        </td>
+                        <td className="defaultStyles">
+                          {data.forecastFrozenIn || "-"}
+                        </td>
+                      </tr>
+                    ));
+                  })()}
+                </tbody>
+              </table>
+            </div>
+          </Tab>
+        </Tabs>
+      </div>
       {/* ################# Level 3 #################### */}
 
       <div className="global-cards">
-        <p className="head-theme">Negotiation Levers</p>
+        <p className="head-theme">
+          Negotiation Levers -{" "}
+          {
+            forecastingCommodityOptions.find(
+              (c) => c.key === globalSelectedCommodity
+            )?.label
+          }
+        </p>
         <div className="table-container my-2">
           <table className="table table-bordered table-sm m-0">
             <thead>
@@ -828,7 +968,7 @@ const OverviewTab = () => {
               </tr>
             </thead>
             <tbody>
-              {negotiationLeversData.map((data, index) => (
+              {filteredNegotiationLevers.map((data, index) => (
                 <tr key={index}>
                   <td
                     className="defaultStyles"
