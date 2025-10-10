@@ -118,11 +118,11 @@ const ChatBot = () => {
             if (
               currentMessages.length === 0 ||
               currentMessages[currentMessages.length - 1].text !==
-                message.content
+                message
             ) {
               currentMessages.push({
                 sender: "bot",
-                text: message.content,
+                text: message,
                 time: new Date().toISOString(),
               });
 

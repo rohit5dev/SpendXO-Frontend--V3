@@ -4,6 +4,8 @@ import { Dropdown, Tabs, Tab } from "react-bootstrap";
 import "../css/CommodityIntelligenceNew.css";
 import "leaflet/dist/leaflet.css";
 import { commodityOverviewData } from "../Data/overviewData";
+import CanvasJSReact from "@canvasjs/react-charts";
+const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
 const OverviewTab = () => {
   // State Management
@@ -123,6 +125,78 @@ const OverviewTab = () => {
     });
   };
 
+  // Get news for delta chart categories (handles different date formats)
+  const getNewsForDeltaCategory = (category) => {
+    // Parse category format like "Q1 2024" or "2024"
+    let targetMonth, targetYear;
+
+    if (category.match(/Q\d \d{4}/)) {
+      // Quarterly format: "Q1 2024"
+      const [quarter, year] = category.split(" ");
+      targetYear = parseInt(year);
+      const quarterNum = parseInt(quarter.replace("Q", ""));
+      targetMonth = (quarterNum - 1) * 3; // Q1=0, Q2=3, Q3=6, Q4=9
+    } else if (category.match(/\d{4}/)) {
+      // Yearly format: "2024"
+      targetYear = parseInt(category);
+      targetMonth = null; // Match all months in the year
+    } else if (category.match(/[A-Z][a-z]{2}-[A-Z][a-z]{2} \d{4}/)) {
+      // Range format: "Jan-Mar 2024"
+      const [range, year] = category.split(" ");
+      const [startMonth] = range.split("-");
+      targetYear = parseInt(year);
+      const monthMap = {
+        Jan: 0,
+        Feb: 1,
+        Mar: 2,
+        Apr: 3,
+        May: 4,
+        Jun: 5,
+        Jul: 6,
+        Aug: 7,
+        Sep: 8,
+        Oct: 9,
+        Nov: 10,
+        Dec: 11,
+      };
+      targetMonth = monthMap[startMonth];
+    } else {
+      // Monthly format like "Apr, 2025"
+      const [monthStr, yearStr] = category.split(", ");
+      targetYear = parseInt(yearStr);
+      const monthMap = {
+        Jan: 0,
+        Feb: 1,
+        Mar: 2,
+        Apr: 3,
+        May: 4,
+        Jun: 5,
+        Jul: 6,
+        Aug: 7,
+        Sep: 8,
+        Oct: 9,
+        Nov: 10,
+        Dec: 11,
+      };
+      targetMonth = monthMap[monthStr];
+    }
+
+    return (commodityOverviewData.newsData || []).filter((newsItem) => {
+      const newsDate = parseDate(newsItem.published);
+      if (targetMonth === null) {
+        // Yearly - match just the year
+        return newsDate.getFullYear() === targetYear;
+      } else {
+        // Quarterly/Monthly - match quarter
+        const newsQuarter = Math.floor(newsDate.getMonth() / 3);
+        const targetQuarter = Math.floor(targetMonth / 3);
+        return (
+          newsDate.getFullYear() === targetYear && newsQuarter === targetQuarter
+        );
+      }
+    });
+  };
+
   // Memoized Values
   const uniqueYears = useMemo(() => {
     const allYears = new Set();
@@ -205,17 +279,145 @@ const OverviewTab = () => {
     }));
   }, [globalSelectedCommodity]);
 
+  // FIXED: Negotiation Levers Filter
   const filteredNegotiationLevers = useMemo(() => {
-    const baseLevers = commodityOverviewData.negotiationLeversData || [];
-    const filterKey =
-      globalSelectedCommodity === "hrcPriceData" ? "HRC" : "CRC";
-    const excludeKey =
-      globalSelectedCommodity === "hrcPriceData" ? "CRC" : "HRC";
-    return baseLevers.filter(
-      (lever) =>
-        lever.quarter.includes(filterKey) || !lever.quarter.includes(excludeKey)
-    );
-  }, [globalSelectedCommodity]);
+    const negotiationData = commodityOverviewData.negotiationLeversData || {};
+    const selectedCommodityKey = commodityKeyMap[globalSelectedCommodity]?.key;
+
+    if (!selectedCommodityKey || !negotiationData[selectedCommodityKey]) {
+      return [];
+    }
+
+    let filteredData = negotiationData[selectedCommodityKey];
+
+    // Filter by year if a specific year is selected
+    if (globalSelectedYear !== "All Years") {
+      filteredData = filteredData.filter((item) => {
+        // Extract year from quarter string (e.g., "Q2-2025" -> "2025")
+        const yearMatch = item.quarter.match(/\d{4}/);
+        return yearMatch && yearMatch[0] === globalSelectedYear;
+      });
+    }
+
+    return filteredData;
+  }, [globalSelectedCommodity, globalSelectedYear]);
+
+  // Forecasted Delta Chart Options
+  const handleForecastedDeltaClick = useCallback((e) => {
+    if (e.dataPoint && e.dataPointIndex !== undefined) {
+      const dataPoint = e.dataPoint;
+      console.log("Forecasted Delta clicked:", dataPoint);
+    }
+  }, []);
+
+  const forecastedDeltaOptions = useMemo(() => {
+    // Get data based on selected commodity
+    const deltaData =
+      commodityOverviewData.forecastedDeltaData?.[
+        commodityKeyMap[globalSelectedCommodity]?.key || "hrc"
+      ] || [];
+
+    // Filter data based on selected year and basis
+    let filteredData = deltaData;
+
+    // Filter by year
+    if (globalSelectedYear !== "All Years") {
+      filteredData = deltaData.filter((item) => {
+        const yearMatch = item.label.match(/\d{4}/);
+        return yearMatch && yearMatch[0] === globalSelectedYear;
+      });
+    }
+
+    // Filter by basis (Monthly/Quarterly/Yearly)
+    if (forecastingDataBasis !== "Monthly Data") {
+      const groupedData = {};
+
+      filteredData.forEach((item) => {
+        const yearMatch = item.label.match(/\d{4}/);
+        const year = yearMatch ? yearMatch[0] : "";
+
+        let periodKey;
+        if (forecastingDataBasis === "Quarterly Data") {
+          const monthMatch = item.label.match(/[A-Za-z]{3}/);
+          const month = monthMatch ? monthMatch[0] : "";
+          const quarter =
+            Math.floor(new Date(`${month} 1, ${year}`).getMonth() / 3) + 1;
+          periodKey = `Q${quarter} ${year}`;
+        } else {
+          // Yearly Data
+          periodKey = year;
+        }
+
+        if (!groupedData[periodKey]) {
+          groupedData[periodKey] = { total: 0, count: 0 };
+        }
+        groupedData[periodKey].total += item.y;
+        groupedData[periodKey].count += 1;
+      });
+
+      filteredData = Object.keys(groupedData).map((period) => ({
+        label: period,
+        y: groupedData[period].total / groupedData[period].count,
+      }));
+    }
+
+    // Ensure all labels are strings and extract only the label property
+    const finalDataPoints = filteredData.map((item) => ({
+      label: String(item.label || ""), // Force string conversion
+      y: item.y,
+    }));
+
+    return {
+      animationEnabled: true,
+      theme: "light2",
+      backgroundColor: "#ffffff",
+      height: 350,
+      axisY: {
+        title: "Forecasted Delta (₹/Tonne)",
+        labelFontFamily: "'Segoe UI', 'Arial', sans-serif",
+        labelFontSize: 11,
+        gridThickness: 0.5,
+        gridColor: "#f0f0f0",
+        lineThickness: 1,
+        tickThickness: 1,
+        titleFontSize: 12,
+        titleFontWeight: "bold",
+      },
+      axisX: {
+        labelFontFamily: "'Segoe UI', 'Arial', sans-serif",
+        labelFontSize: 10,
+        labelAngle: -45,
+        interval: 1,
+        title: {
+          text: "Time Period",
+          fontSize: 12,
+          fontWeight: "bold",
+        },
+      },
+      toolTip: {
+        shared: false,
+        content: "{label}: ₹{y}",
+      },
+      data: [
+        {
+          type: "waterfall",
+          yValueFormatString: "₹#,##0.00",
+          indexLabel: "₹{y}",
+          indexLabelFontSize: 10,
+          indexLabelPlacement: "outside",
+          risingColor: "#0ae49f", // green
+          fallingColor: "#ff6958ff", // red
+          dataPoints: finalDataPoints,
+          click: handleForecastedDeltaClick,
+        },
+      ],
+    };
+  }, [
+    globalSelectedCommodity,
+    globalSelectedYear,
+    forecastingDataBasis,
+    handleForecastedDeltaClick,
+  ]);
 
   // Chart Configuration Generator
   const createDeltaChart = (dataKey, settledMode = false) => {
@@ -310,11 +512,21 @@ const OverviewTab = () => {
           toolbar: { show: true },
           events: {
             dataPointSelection: (event, chartContext, config) => {
-              if (config?.dataPointIndex !== undefined)
-                console.log(
-                  `${settledMode ? "Settled" : "Delta"} View clicked:`,
-                  filteredData[config.dataPointIndex]
-                );
+              if (config?.dataPointIndex !== undefined) {
+                const selectedData = filteredData[config.dataPointIndex];
+                if (selectedData) {
+                  console.log(
+                    `${settledMode ? "Settled" : "Delta"} View clicked:`,
+                    selectedData
+                  );
+                  // Update news selection
+                  const newsList = getNewsForDeltaCategory(
+                    selectedData.category
+                  );
+                  setForecastingSelectedNews(newsList);
+                  setForecastingSelectedNewsDate(selectedData.category);
+                }
+              }
             },
           },
         },
@@ -358,6 +570,7 @@ const OverviewTab = () => {
           custom: ({ series, seriesIndex, dataPointIndex }) => {
             const dataPoint = filteredData[dataPointIndex];
             if (!dataPoint) return "";
+
             const seriesName =
               seriesIndex === 0
                 ? "Actual Delta"
@@ -371,7 +584,74 @@ const OverviewTab = () => {
                 : settledMode
                 ? "Not Settled Yet"
                 : "No data";
-            return `<div style="padding: 8px 12px"><strong>${dataPoint.category}</strong><br/>${seriesName}: ${displayValue}</div>`;
+
+            // Get news for this category
+            const newsList = getNewsForDeltaCategory(dataPoint.category);
+
+            let html = `<div style="padding: 8px 12px; max-width: 600px">
+              <strong>${dataPoint.category}</strong><br/>
+              ${seriesName}: ${displayValue}`;
+
+            // Add news if available
+            if (newsList?.length > 0) {
+              html += `<hr style="margin:6px 0"/><div style="max-width:500px">`;
+              newsList.slice(0, 2).forEach((news) => {
+                const sentimentBg =
+                  news.sentiment_score > 0
+                    ? "rgb(181, 255, 207)"
+                    : news.sentiment_score < 0
+                    ? "rgba(255, 167, 157)"
+                    : "rgb(255, 220, 151)";
+                const sentimentText =
+                  news.sentiment_score > 0
+                    ? "Positive Sentiment"
+                    : news.sentiment_score < 0
+                    ? "Negative Sentiment"
+                    : "Neutral Sentiment";
+                const impactBg =
+                  news.impactLevel === "High Impact"
+                    ? "rgb(181, 255, 207)"
+                    : news.impactLevel === "Low Impact"
+                    ? "rgba(255, 167, 157)"
+                    : "rgb(255, 220, 151)";
+                const durationBg =
+                  news.impactDuration === "Long-term Impact"
+                    ? "rgb(181, 255, 207)"
+                    : news.impactDuration === "Short-term Impact"
+                    ? "rgba(255, 167, 157)"
+                    : "rgb(255, 220, 151)";
+
+                html += `<div style="text-align:start; display:flex;align-items:flex-start;justify-content:flex-start;margin-bottom:6px" class="card p-2">
+                  <div style="flex:1;min-width:0">
+                    <div style="font-weight:600;font-size:12px;line-height:1.2;" title="${
+                      news.title
+                    }">${
+                  news.title.length > 50
+                    ? news.title.substring(0, 50) + "..."
+                    : news.title
+                }</div>
+                    <div style="font-size:10px;color:#888">${
+                      news.published || "No date"
+                    }</div>
+                    <div class="mt-1" style="font-size:11px;color:rgba(0, 0, 0, 0.8); background-color: ${sentimentBg}; padding:2px 6px; border-radius:4px; display:inline-block;">${sentimentText}</div>
+                    <div style="font-size:11px;color:rgba(0, 0, 0, 0.8); background-color: ${impactBg}; padding:2px 6px; border-radius:4px; display:inline-block;">${
+                  news.impactLevel
+                }</div>
+                    <div style="font-size:11px;color:rgba(0, 0, 0, 0.8); background-color: ${durationBg}; padding:2px 6px; border-radius:4px; display:inline-block;">${
+                  news.impactDuration
+                }</div>
+                  </div>
+                </div>`;
+              });
+              if (newsList.length > 2)
+                html += `<div style="font-size:11px;color:#888">+${
+                  newsList.length - 2
+                } more news</div>`;
+              html += `</div>`;
+            }
+
+            html += `</div>`;
+            return html;
           },
         },
         ...(settledMode && { annotations: { points: pendingAnnotations } }),
@@ -386,6 +666,7 @@ const OverviewTab = () => {
           data: filteredData.map((item) => item[secondSeriesKey]),
         },
       ],
+      filteredData, // Return this for news panel access
     };
   };
 
@@ -612,11 +893,69 @@ const OverviewTab = () => {
       : commodityOverviewData.newsData || [];
   const newsTitle =
     forecastingSelectedNews?.length > 0 && forecastingSelectedNewsDate
-      ? `News for ${formatXAxisLabel(
-          forecastingSelectedNewsDate,
-          forecastingDataBasis
-        )}`
+      ? `News for ${forecastingSelectedNewsDate}`
       : "All News";
+
+  // News Card Component (reusable)
+  const NewsCard = ({ title, news }) => (
+    <div
+      className="news-card mt-2 pt-3 global-cards text-start"
+      style={{
+        height: 400,
+        overflowY: "auto",
+        backgroundColor: "rgba(255, 255, 255, 0.62)",
+      }}
+    >
+      <p className="head-theme">{title}</p>
+      <div>
+        {news.map((x, idx) => (
+          <div
+            key={idx}
+            className="news-item d-flex flex-column justify-content-start text-start mt-2"
+          >
+            <div
+              className="global-dashed-card d-flex flex-column justify-content-between rounded-4 p-2 mt-1 text-start position-relative"
+              style={{
+                cursor: "pointer",
+                backgroundColor: "rgb(245, 245, 245)",
+              }}
+              onClick={() => window.open(x.url, "_blank")}
+            >
+              <p className="mb-1 p-0 global-font">{x.category}</p>
+              <p
+                className="fw-bold m-0 mb-2 p-0 global-font"
+                style={{ color: "var(--color-main)" }}
+              >
+                {x.title}
+              </p>
+              <p className="global-font p-0 m-0 text-secondary">
+                Released on {x.published}
+              </p>
+              <p
+                className="position-absolute bottom-0 end-0 text-center px-2 global-font rounded-2 m-2"
+                style={{
+                  background:
+                    x.sentiment_score === 0
+                      ? "var(--color-bg-yellow)"
+                      : x.sentiment_score === 1
+                      ? "var(--color-bg-green)"
+                      : "var(--color-bg-red)",
+                  width: "130px",
+                }}
+              >
+                {x.sentiment_score === 0
+                  ? "Neutral"
+                  : x.sentiment_score === 1
+                  ? "Positive"
+                  : "Negative"}{" "}
+                Sentiment
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <div className="commodity-data mt-2">
@@ -760,70 +1099,14 @@ const OverviewTab = () => {
                 </div>
               </div>
               <div className="col-3">
-                <div
-                  className="news-card mt-2 pt-3 global-cards text-start"
-                  style={{
-                    height: 400,
-                    overflowY: "auto",
-                    backgroundColor: "rgba(255, 255, 255, 0.62)",
-                  }}
-                >
-                  <p className="head-theme">{newsTitle}</p>
-                  <div>
-                    {newsToShow.map((x, idx) => (
-                      <div
-                        key={idx}
-                        className="news-item d-flex flex-column justify-content-start text-start mt-2"
-                      >
-                        <div
-                          className="global-dashed-card d-flex flex-column justify-content-between rounded-4 p-2 mt-1 text-start position-relative"
-                          style={{
-                            cursor: "pointer",
-                            backgroundColor: "rgb(245, 245, 245)",
-                          }}
-                          onClick={() => window.open(x.url, "_blank")}
-                        >
-                          <p className="mb-1 p-0 global-font">{x.category}</p>
-                          <p
-                            className="fw-bold m-0 mb-2 p-0 global-font"
-                            style={{ color: "var(--color-main)" }}
-                          >
-                            {x.title}
-                          </p>
-                          <p className="global-font p-0 m-0 text-secondary">
-                            Released on {x.published}
-                          </p>
-                          <p
-                            className="position-absolute bottom-0 end-0 text-center px-2 global-font rounded-2 m-2"
-                            style={{
-                              background:
-                                x.sentiment_score === 0
-                                  ? "var(--color-bg-yellow)"
-                                  : x.sentiment_score === 1
-                                  ? "var(--color-bg-green)"
-                                  : "var(--color-bg-red)",
-                              width: "130px",
-                            }}
-                          >
-                            {x.sentiment_score === 0
-                              ? "Neutral"
-                              : x.sentiment_score === 1
-                              ? "Positive"
-                              : "Negative"}{" "}
-                            Sentiment
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <NewsCard title={newsTitle} news={newsToShow} />
               </div>
             </div>
           </Tab>
 
           <Tab eventKey="DeltaView" title="Delta View">
             <div className="row g-2 mb-2">
-              <div className="col-12">
+              <div className="col-9">
                 <div
                   className="w-100 mb-2 global-cards mt-2"
                   style={{ minHeight: "380px" }}
@@ -843,16 +1126,70 @@ const OverviewTab = () => {
                   )}
                 </div>
               </div>
+              <div className="col-3">
+                <NewsCard title={newsTitle} news={newsToShow} />
+              </div>
             </div>
           </Tab>
 
           <Tab eventKey="ForecastedDelta" title="Forecasted Delta">
-            <p />
+            <div
+              className="w-100 mb-2 global-cards mt-2"
+              style={{ minHeight: "380px" }}
+            >
+              {/* Heading and Filters */}
+              <div className="d-flex justify-content-between align-items-center mb-3 px-2">
+                <p className="head-theme">
+                  Forecasted Delta -{" "}
+                  {
+                    commodityOptions.find(
+                      (c) => c.key === globalSelectedCommodity
+                    )?.label
+                  }
+                </p>
+                <div className="d-flex gap-2">
+                  <Dropdown onSelect={setForecastingDataBasis}>
+                    <Dropdown.Toggle variant="light" size="sm">
+                      {forecastingDataBasis}
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                      {["Monthly Data", "Quarterly Data", "Yearly Data"].map(
+                        (basis) => (
+                          <Dropdown.Item key={basis} eventKey={basis}>
+                            {basis}
+                          </Dropdown.Item>
+                        )
+                      )}
+                    </Dropdown.Menu>
+                  </Dropdown>
+                  <button
+                    className="btn btn-theme global-font"
+                    onClick={resetChartFilters}
+                  >
+                    Reset Chart
+                  </button>
+                </div>
+              </div>
+
+              {/* Chart - Full Width */}
+              <div style={{ padding: "0 10px", height: 350, width: "100%" }}>
+                <CanvasJSChart
+                  options={forecastedDeltaOptions}
+                  containerProps={{
+                    style: {
+                      width: "100%",
+                      height: "100%",
+                      position: "relative",
+                    },
+                  }}
+                />
+              </div>
+            </div>
           </Tab>
 
           <Tab eventKey="SettledDelta" title="Settled Delta">
             <div className="row g-2 mb-2">
-              <div className="col-12">
+              <div className="col-9">
                 <div
                   className="w-100 mb-2 global-cards mt-2"
                   style={{ minHeight: "380px" }}
@@ -870,6 +1207,9 @@ const OverviewTab = () => {
                     </div>
                   )}
                 </div>
+              </div>
+              <div className="col-3">
+                <NewsCard title={newsTitle} news={newsToShow} />
               </div>
             </div>
           </Tab>

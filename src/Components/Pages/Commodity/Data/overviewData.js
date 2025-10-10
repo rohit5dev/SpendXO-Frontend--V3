@@ -15267,49 +15267,92 @@ export const commodityOverviewData = {
     },
   ],
   //Negotiation Levers Data
-  negotiationLeversData: [
-    {
-      quarter: "Q2-2025\n(Apr–Jun)",
-      activeScenario: "Base",
-      likelihood: "High",
-      activeDeltaRange: "₹1.1 to ₹1.2",
-      modelDelta: "₹ 1.14",
-      marketSentiment: "Stable",
-      keyDrivers:
-        "The sharp rise in HRC prices during Mar–Apr has plateaued. In June, mills held list prices flat despite muted demand. No new hikes were announced. While safeguard duty (12%) remains in effect, speculation of a 24% hike is building. Imports from SEA remain elevated, and the recent U.S. tariff hike on Chinese steel raises risk of regional oversupply.",
-      deltaTrend: [
-        "Trend 1: Safeguard duty effect has been fully priced in. Duty hike speculation from 12% to 24% is being used as a forward-looking justification by mills, but remains uncertain.",
-        "Trend 2: Imports remain elevated despite duty; Korea and Japan continue to supply actively.",
-        "Trend 3: U.S. doubling of tariffs on imported steel has raised risk of regional redirection and softening benchmarks.",
-        "Trend 4: Infrastructure and construction demand is seasonally suppressed, adding downward pressure on mill realizations.",
-      ],
-      negotiationStrategy: [
-        "Lever 1: Defer major buys to late June or July to capture downside from demand dip and import competition.",
-        "Lever 2: Do not accept duty hike arguments as fact — demand transparent, even-based pricing.",
-        "Lever 3: Benchmark against Korean/Japanese landed offers to enforce pricing discipline.",
-        "Lever 4: Use oversupply signals (China redirection + SEA pricing) to push for short-term flexible rate bands.",
-      ],
-    },
-    {
-      quarter: "Q1-2025\n(Jan–Mar)",
-      activeScenario: "Upside",
-      likelihood: "High",
-      activeDeltaRange: "₹2.0 to ₹2.5",
-      modelDelta: "₹ 3.35",
-      marketSentiment: "Negative",
-      keyDrivers:
-        "Safeguard duty anticipation and resilient domestic demand outweigh raw material cost softness, supporting firm pricing into March.",
-      deltaTrend: [
-        "Trend 1: Steel prices faced slight downward pressure in January–February driven by weak demand and increased import inflows.",
-        "Trend 2: From March onwards, mills firmed pricing due to safeguard duty anticipation and expected tightening of global supply.",
-      ],
-      negotiationStrategy: [
-        "Lever 1: Leverage early-quarter import oversupply and lower raw material costs to secure favorable deals.",
-        "Lever 2: Push back against any speculative price hikes tied to an unconfirmed safeguard policy.",
-        "Lever 3: Secure strategic volumes cautiously before full safeguard duty confirmation to mitigate late-quarter price firming risks.",
-      ],
-    },
-  ],
+  negotiationLeversData: {
+    hrc: [
+      {
+        quarter: "Q2-2025\n(Apr–Jun)",
+        activeScenario: "Base",
+        likelihood: "High",
+        activeDeltaRange: "₹1.1 to ₹1.2",
+        modelDelta: "₹ 1.14",
+        marketSentiment: "Stable",
+        keyDrivers:
+          "The sharp rise in HRC prices during Mar–Apr has plateaued. In June, mills held list prices flat despite muted demand. No new hikes were announced. While safeguard duty (12%) remains in effect, speculation of a 24% hike is building. Imports from SEA remain elevated, and the recent U.S. tariff hike on Chinese steel raises risk of regional oversupply.",
+        deltaTrend: [
+          "Trend 1: Safeguard duty effect has been fully priced in. Duty hike speculation from 12% to 24% is being used as a forward-looking justification by mills, but remains uncertain.",
+          "Trend 2: Imports remain elevated despite duty; Korea and Japan continue to supply actively.",
+          "Trend 3: U.S. doubling of tariffs on imported steel has raised risk of regional redirection and softening benchmarks.",
+          "Trend 4: Infrastructure and construction demand is seasonally suppressed, adding downward pressure on mill realizations.",
+        ],
+        negotiationStrategy: [
+          "Lever 1: Defer major buys to late June or July to capture downside from demand dip and import competition.",
+          "Lever 2: Do not accept duty hike arguments as fact — demand transparent, even-based pricing.",
+          "Lever 3: Benchmark against Korean/Japanese landed offers to enforce pricing discipline.",
+          "Lever 4: Use oversupply signals (China redirection + SEA pricing) to push for short-term flexible rate bands.",
+        ],
+      },
+      {
+        quarter: "Q1-2025\n(Jan–Mar)",
+        activeScenario: "Upside",
+        likelihood: "High",
+        activeDeltaRange: "₹2.0 to ₹2.5",
+        modelDelta: "₹ 3.35",
+        marketSentiment: "Negative",
+        keyDrivers:
+          "Safeguard duty anticipation and resilient domestic demand outweigh raw material cost softness, supporting firm pricing into March.",
+        deltaTrend: [
+          "Trend 1: Steel prices faced slight downward pressure in January–February driven by weak demand and increased import inflows.",
+          "Trend 2: From March onwards, mills firmed pricing due to safeguard duty anticipation and expected tightening of global supply.",
+        ],
+        negotiationStrategy: [
+          "Lever 1: Leverage early-quarter import oversupply and lower raw material costs to secure favorable deals.",
+          "Lever 2: Push back against any speculative price hikes tied to an unconfirmed safeguard policy.",
+          "Lever 3: Secure strategic volumes cautiously before full safeguard duty confirmation to mitigate late-quarter price firming risks.",
+        ],
+      },
+    ],
+    crc: [
+      {
+        quarter: "Q2-2025 (Apr–Jun)",
+        activeScenario: "Base",
+        likelihood: "High",
+        activeDeltaRange: "₹1.8 to ₹2.0",
+        modelDelta: "₹ 1.90",
+        marketSentiment: "Stable",
+        keyDrivers:
+          "CRC prices are softening after Q1 gains. While safeguard duty supported prices in April, its effect was fully priced in early Q2. Exports remain weak, and imports from SEA continue despite the duty. June saw no list price hikes from mills, indicating margin pressure. Speculation of a safeguard duty hike is building, while U.S. steel tariffs raise the risk of Chinese CRC redirection to Asia.",
+        deltaTrend: [
+          "Trend 1: April safeguard duty fully priced in. Anticipation of a duty hike from 12% to 24%, currently purely speculative.",
+          "Trend 2: CRC exports remain low, adding surplus and weakening mill leverage.",
+          "Trend 3: Imports from SEA continue despite duty, putting price pressure on domestic CRC.",
+        ],
+        negotiationStrategy: [
+          "Lever 1: Demand import-parity pricing using SEA landed offers as benchmarks.",
+          "Lever 2: Push back on duty hike speculation — no policy has been confirmed; reject any preemptive markup.",
+          "Lever 3: Secure volume-linked discounts or rebates in June citing mill rollover and trade softness.",
+        ],
+      },
+      {
+        quarter: "Q1-2025 (Jan–Mar)",
+        activeScenario: "Upside",
+        likelihood: "High",
+        activeDeltaRange: "₹1.2 to ₹1.5",
+        modelDelta: "₹ 2.58",
+        marketSentiment: "Negative",
+        keyDrivers:
+          "Strong automotive demand and indirect impact from safeguard anticipation on HRC input costs support steady CRC pricing through the quarter.",
+        deltaTrend: [
+          "Trend 1: CRC prices remained largely stable during January–February underpinned by consistent demand from OEMs and the appliance sector.",
+          "Trend 2: A slight upward adjustment in CRC prices was observed in March, following the strengthening of HRC base prices.",
+        ],
+        negotiationStrategy: [
+          "Lever 1: Tie CRC pricing closely to HRC to prevent unjustified premiums.",
+          "Lever 2: Negotiate flexible contracts early to lock favorable rates before March firmness.",
+          "Lever 3: Use early-quarter price stability to secure volume discounts.",
+        ],
+      },
+    ],
+  },
 
   //
 
@@ -15617,49 +15660,126 @@ export const commodityOverviewData = {
     },
   },
 
-
-
-
   settledDeltaChartData: {
-  hrc: {
-    categories: [
-      "2022 Q1", "2022 Q2", "2022 Q3", "2022 Q4",
-      "2023 Q1", "2023 Q2", "2023 Q3", "2023 Q4", 
-      "2024 Q1", "2024 Q2", "2024 Q3", "2024 Q4",
-      "2025 Q1", "2025 Q2"
-    ],
-    actualDelta: [
-      8.00, -12.50, -4.90, -3.05,
-      6.35, -3.80, 1.98, -1.75,
-      -2.63, 0.50, -5.10, -0.75,
-      3.35, 1.45
-    ],
-    settledDelta: [
-      6.00, -10.20, -4.90, -1.30,
-      4.60, -3.80, 2.00, -1.75,
-      -2.40, 0.50, -4.75, null,
-      null, null
-    ]
+    hrc: {
+      categories: [
+        "2022 Q1",
+        "2022 Q2",
+        "2022 Q3",
+        "2022 Q4",
+        "2023 Q1",
+        "2023 Q2",
+        "2023 Q3",
+        "2023 Q4",
+        "2024 Q1",
+        "2024 Q2",
+        "2024 Q3",
+        "2024 Q4",
+        "2025 Q1",
+        "2025 Q2",
+      ],
+      actualDelta: [
+        8.0, -12.5, -4.9, -3.05, 6.35, -3.8, 1.98, -1.75, -2.63, 0.5, -5.1,
+        -0.75, 3.35, 1.45,
+      ],
+      settledDelta: [
+        6.0,
+        -10.2,
+        -4.9,
+        -1.3,
+        4.6,
+        -3.8,
+        2.0,
+        -1.75,
+        -2.4,
+        0.5,
+        -4.75,
+        null,
+        null,
+        null,
+      ],
+    },
+    crc: {
+      categories: [
+        "2022 Q1",
+        "2022 Q2",
+        "2022 Q3",
+        "2022 Q4",
+        "2023 Q1",
+        "2023 Q2",
+        "2023 Q3",
+        "2023 Q4",
+        "2024 Q1",
+        "2024 Q2",
+        "2024 Q3",
+        "2024 Q4",
+        "2025 Q1",
+        "2025 Q2",
+      ],
+      actualDelta: [
+        6.5, -8.5, -4.2, -3.6, 5.05, -4.33, 1.93, -0.7, -2.13, -0.2, -3.75,
+        -1.8, 2.58, 2.05,
+      ],
+      settledDelta: [
+        5.0,
+        -10.2,
+        -4.2,
+        -1.55,
+        3.0,
+        -4.33,
+        2.0,
+        -0.7,
+        -2.14,
+        0.2,
+        -4.15,
+        null,
+        null,
+        null,
+      ],
+    },
   },
-  crc: {
-    categories: [
-      "2022 Q1", "2022 Q2", "2022 Q3", "2022 Q4",
-      "2023 Q1", "2023 Q2", "2023 Q3", "2023 Q4",
-      "2024 Q1", "2024 Q2", "2024 Q3", "2024 Q4",
-      "2025 Q1", "2025 Q2"
+  forecastedDeltaData: {
+    hrc: [
+      { label: "Apr, 2025", y: 1.55 },
+      { label: "May, 2025", y: -0.1 },
+      { label: "Jun, 2025", y: -0.31 },
+      { label: "Jul, 2025", y: -0.08 },
+      { label: "Aug, 2025", y: 0.02 },
+      { label: "Sep, 2025", y: 0.2 },
+      { label: "Oct, 2025", y: -0.42 },
+      { label: "Nov, 2025", y: -0.43 },
+      { label: "Dec, 2025", y: -1.3 },
+      { label: "Jan, 2026", y: -0.36 },
+      { label: "Feb, 2026", y: 0.41 },
+      { label: "Mar, 2026", y: 0.51 },
+      { label: "Apr, 2026", y: 0.7 },
+      { label: "May, 2026", y: -0.03 },
+      { label: "Jun, 2026", y: 0.07 },
+      { label: "Jul, 2026", y: -0.93 },
+      { label: "Aug, 2026", y: -0.45 },
+      { label: "Sep, 2026", y: -0.28 },
+      { label: "Oct, 2026", y: 0.15 },
     ],
-    actualDelta: [
-      6.50, -8.50, -4.20, -3.60,
-      5.05, -4.33, 1.93, -0.70,
-      -2.13, -0.20, -3.75, -1.80,
-      2.58, 2.05
+    crc: [
+      { label: "Apr, 2025", y: 1.6 },
+      { label: "May, 2025", y: 0.45 },
+      { label: "Jun, 2025", y: -0.15 },
+      { label: "Jul, 2025", y: -0.08 },
+      { label: "Aug, 2025", y: -0.04 },
+      { label: "Sep, 2025", y: 0.29 },
+      { label: "Oct, 2025", y: -0.77 },
+      { label: "Nov, 2025", y: -0.51 },
+      { label: "Dec, 2025", y: -1.24 },
+      { label: "Jan, 2026", y: -1.1 },
+      { label: "Feb, 2026", y: 1.45 },
+      { label: "Mar, 2026", y: 0.44 },
+      { label: "Apr, 2026", y: -0.79 },
+      { label: "May, 2026", y: -0.2 },
+      { label: "Jun, 2026", y: -0.17 },
+      { label: "Jul, 2026", y: -1.01 },
+      { label: "Aug, 2026", y: -0.46 },
+      { label: "Sep, 2026", y: -0.42 },
+      { label: "Oct, 2026", y: 0.19 },
     ],
-    settledDelta: [
-      5.00, -10.20, -4.20, -1.55,
-      3.00, -4.33, 2.00, -0.70,
-      -2.14, 0.20, -4.15, null,
-      null, null
-    ]
-  }
-}
+  },
 };
