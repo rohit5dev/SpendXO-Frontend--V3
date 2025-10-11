@@ -869,7 +869,7 @@ const SavingOverview = () => {
       <Row className="g-2 mb-2">
         {/* Saving by Sourcing Type */}
         <Col xs={12} md={6} lg={4} xl={2}>
-          <Card className="h-100 shadow-sm" style={{zIndex: 1000}}>
+          <Card className="h-100 shadow-sm" style={{ zIndex: 1000 }}>
             <Card.Body>
               <p className="head-theme">Saving by Sourcing Type</p>
               <div style={{ height: "220px" }}>

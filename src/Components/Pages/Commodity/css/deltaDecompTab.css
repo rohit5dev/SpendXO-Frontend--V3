@@ -1,0 +1,115 @@
+.kp-text {
+  margin: 0;
+  font-size: 12px;
+}
+
+.kpi-container {
+  display: flex;
+  text-align: left;
+  gap: 10px;
+}
+
+.kpi-box {
+  padding: 10px 20px;
+  background-color: white;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  font-size: 12px;
+  flex: 1;
+}
+
+.rb-col-box.insight-box {
+  height: 280px;
+  min-height: 280px;
+  max-height: 280px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(40, 48, 70, 0.07);
+  margin-bottom: 0;
+  overflow: visible;
+  position: relative;
+  z-index: 1; /* ← ADD THIS LINE */
+}
+
+.canvasjs-chart-container,
+.canvasjs-chart-canvas {
+  height: 220px !important;
+}
+
+/* Ensure tooltip is visible and on top */
+
+/* .canvasjs-chart-tooltip {
+  z-index: 9999 !important;
+  position: absolute !important;
+} */
+
+.canvasjs-chart-container {
+  overflow: visible !important;
+  position: relative !important;
+}
+
+.scroll-tbody {
+  height: 220px;
+  overflow-y: auto;
+}
+
+.styled-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 12px;
+  table-layout: fixed;
+  word-break: break-word;
+}
+
+.styled-table th,
+.styled-table td {
+  border: 1px solid #ecf0f2;
+  padding: 5px 8px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.styled-table th {
+  background: var(--color-main);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.styled-table tr:nth-child(even) {
+  background: #f6f8fa;
+}
+
+.styled-table tr:hover {
+  background: #e9eef6;
+}
+
+/* Force tooltip positioning */
+/* Force tooltip positioning */
+.canvasjs-chart-tooltip {
+  z-index: 99999 !important;
+  position: relative !important;
+  pointer-events: none !important;
+  width: auto !important; /* ← ADD THIS LINE */
+  max-width: 200px !important; /* ← ADD THIS LINE */
+  white-space: nowrap !important; /* ← ADD THIS LINE */
+}
+
+.scenario-table-container {
+  width: 100%;
+  position: relative;
+}
+.scenario-table-container thead th {
+  position: sticky;
+  top: 0;
+  background: var(--color-main); /* or #fff for non-highlighted */
+  z-index: 2;
+}
+.scroll-tbody {
+  max-height: 180px; /* adjust as needed */
+  overflow-y: auto;
+  width: 100%;
+}
