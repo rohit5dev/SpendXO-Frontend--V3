@@ -117,10 +117,7 @@ const DeltaDecomposition = () => {
   return (
     <div>
       {/* FILTERS */}
-      <div
-        className="global-filters"
-        style={{ display: "flex", gap: 18, marginBottom: 5, width: 400 }}
-      >
+      <div className=" d-flex gap-2  my-2" style={{ width: 400 }}>
         <Form.Group className="global-filter-input">
           <Form.Label className="global-filter-label">
             Commodity Group
@@ -137,6 +134,7 @@ const DeltaDecomposition = () => {
             ))}
           </Form.Select>
         </Form.Group>
+
         <Form.Group className="global-filter-input">
           <Form.Label className="global-filter-label">
             Commodity Name
@@ -153,6 +151,7 @@ const DeltaDecomposition = () => {
             ))}
           </Form.Select>
         </Form.Group>
+
         <Form.Group className="global-filter-input">
           <Form.Label className="global-filter-label">Region</Form.Label>
           <Form.Select
@@ -170,10 +169,7 @@ const DeltaDecomposition = () => {
       </div>
 
       {/* KPI Cards */}
-      <div
-        className="kpi-container"
-        style={{ display: "flex", gap: "12px", marginBottom: "18px" }}
-      >
+      <div className="kpi-container d-flex gap-2 mb-2 mt-0 ">
         {currentKPIData.map((kpi, idx) => (
           <div className="kpi-box" key={idx}>
             <p className="kp-text">{kpi.label}</p>
@@ -182,17 +178,11 @@ const DeltaDecomposition = () => {
         ))}
       </div>
 
-      {/* Insights row */}
-      <Row style={{ gap: 0 }}>
+      {/* Insights Row */}
+      <Row className="gx-2">
         <Col md={6}>
           <div className="rb-col-box insight-box">
-            <div
-              style={{
-                fontWeight: 600,
-                fontSize: "13px",
-                marginBottom: "6px",
-              }}
-            >
+            <div className="fw-semibold mb-2" style={{ fontSize: "13px" }}>
               % Share of Delta Components
             </div>
             <div
@@ -217,15 +207,10 @@ const DeltaDecomposition = () => {
             </div>
           </div>
         </Col>
+
         <Col md={6}>
           <div className="rb-col-box insight-box">
-            <div
-              style={{
-                fontWeight: 600,
-                fontSize: "13px",
-                marginBottom: "6px",
-              }}
-            >
+            <div className="fw-semibold mb-2" style={{ fontSize: "13px" }}>
               {commodityName} Delta Breakdown
             </div>
             {/* Table header stays, tbody scrolls */}
@@ -265,12 +250,10 @@ const DeltaDecomposition = () => {
         </Col>
       </Row>
 
-      <Row style={{ marginTop: 18 }}>
+      <Row className="mt-2">
         <Col md={12}>
           <div className="rb-col-box insight-box">
-            <div
-              style={{ fontWeight: 600, fontSize: "13px", marginBottom: "6px" }}
-            >
+            <div className="fw-semibold mb-2" style={{ fontSize: "13px" }}>
               {commodityName} Scenario Analysis
             </div>
             {/* Table header stays fixed; tbody scrolls */}

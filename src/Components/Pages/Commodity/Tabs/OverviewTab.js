@@ -15,14 +15,14 @@ const OverviewTab = () => {
   const [globalSelectedYear, setGlobalSelectedYear] = useState("All Years");
   const [forecastingDataBasis, setForecastingDataBasis] =
     useState("Monthly Data");
-  
+
   // Separate news states for each tab
   const [priceTrendNews, setPriceTrendNews] = useState([]);
   const [priceTrendNewsDate, setPriceTrendNewsDate] = useState(null);
-  
+
   const [deltaViewNews, setDeltaViewNews] = useState([]);
   const [deltaViewNewsDate, setDeltaViewNewsDate] = useState(null);
-  
+
   const [settledDeltaNews, setSettledDeltaNews] = useState([]);
   const [settledDeltaNewsDate, setSettledDeltaNewsDate] = useState(null);
 
@@ -177,8 +177,18 @@ const OverviewTab = () => {
       const [monthStr, yearStr] = category.split(", ");
       targetYear = parseInt(yearStr);
       const monthMap = {
-        Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
-        Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11,
+        Jan: 0,
+        Feb: 1,
+        Mar: 2,
+        Apr: 3,
+        May: 4,
+        Jun: 5,
+        Jul: 6,
+        Aug: 7,
+        Sep: 8,
+        Oct: 9,
+        Nov: 10,
+        Dec: 11,
       };
       targetMonth = monthMap[monthStr];
     }
@@ -285,7 +295,7 @@ const OverviewTab = () => {
   const filteredNegotiationLevers = useMemo(() => {
     const negotiationData = commodityOverviewData.negotiationLeversData || {};
     const selectedCommodityKey = commodityKeyMap[globalSelectedCommodity]?.key;
-    
+
     if (!selectedCommodityKey || !negotiationData[selectedCommodityKey]) {
       return [];
     }
@@ -294,7 +304,7 @@ const OverviewTab = () => {
 
     // Filter by year if a specific year is selected
     if (globalSelectedYear !== "All Years") {
-      filteredData = filteredData.filter(item => {
+      filteredData = filteredData.filter((item) => {
         // Extract year from quarter string (e.g., "Q2-2025" -> "2025")
         const yearMatch = item.quarter.match(/\d{4}/);
         return yearMatch && yearMatch[0] === globalSelectedYear;
@@ -314,16 +324,17 @@ const OverviewTab = () => {
 
   const forecastedDeltaOptions = useMemo(() => {
     // Get data based on selected commodity
-    const deltaData = commodityOverviewData.forecastedDeltaData?.[
-      commodityKeyMap[globalSelectedCommodity]?.key || 'hrc'
-    ] || [];
+    const deltaData =
+      commodityOverviewData.forecastedDeltaData?.[
+        commodityKeyMap[globalSelectedCommodity]?.key || "hrc"
+      ] || [];
 
     // Filter data based on selected year and basis
     let filteredData = deltaData;
 
     // Filter by year
     if (globalSelectedYear !== "All Years") {
-      filteredData = deltaData.filter(item => {
+      filteredData = deltaData.filter((item) => {
         const yearMatch = item.label.match(/\d{4}/);
         return yearMatch && yearMatch[0] === globalSelectedYear;
       });
@@ -332,18 +343,20 @@ const OverviewTab = () => {
     // Filter by basis (Monthly/Quarterly/Yearly)
     if (forecastingDataBasis !== "Monthly Data") {
       const groupedData = {};
-      
-      filteredData.forEach(item => {
+
+      filteredData.forEach((item) => {
         const yearMatch = item.label.match(/\d{4}/);
         const year = yearMatch ? yearMatch[0] : "";
-        
+
         let periodKey;
         if (forecastingDataBasis === "Quarterly Data") {
           const monthMatch = item.label.match(/[A-Za-z]{3}/);
           const month = monthMatch ? monthMatch[0] : "";
-          const quarter = Math.floor((new Date(`${month} 1, ${year}`).getMonth()) / 3) + 1;
+          const quarter =
+            Math.floor(new Date(`${month} 1, ${year}`).getMonth() / 3) + 1;
           periodKey = `Q${quarter} ${year}`;
-        } else { // Yearly Data
+        } else {
+          // Yearly Data
           periodKey = year;
         }
 
@@ -354,23 +367,23 @@ const OverviewTab = () => {
         groupedData[periodKey].count += 1;
       });
 
-      filteredData = Object.keys(groupedData).map(period => ({
+      filteredData = Object.keys(groupedData).map((period) => ({
         label: period,
-        y: groupedData[period].total / groupedData[period].count
+        y: groupedData[period].total / groupedData[period].count,
       }));
     }
 
     // Ensure all labels are strings and extract only the label property
-    const finalDataPoints = filteredData.map(item => ({
+    const finalDataPoints = filteredData.map((item) => ({
       label: String(item.label || ""), // Force string conversion
-      y: item.y
+      y: item.y,
     }));
 
     return {
       animationEnabled: true,
       theme: "light2",
       backgroundColor: "#ffffff",
-      height: 350,
+      height: 320, // changed from 350 -> match other charts (320)
       axisY: {
         title: "Forecasted Delta (₹/Tonne)",
         labelFontFamily: "'Segoe UI', 'Arial', sans-serif",
@@ -409,10 +422,19 @@ const OverviewTab = () => {
         },
       ],
     };
-  }, [globalSelectedCommodity, globalSelectedYear, forecastingDataBasis, handleForecastedDeltaClick]);
+  }, [
+    globalSelectedCommodity,
+    globalSelectedYear,
+    forecastingDataBasis,
+    handleForecastedDeltaClick,
+  ]);
 
   // Chart Configuration Generator
-  const createDeltaChart = (dataKey, settledMode = false, tabType = "deltaView") => {
+  const createDeltaChart = (
+    dataKey,
+    settledMode = false,
+    tabType = "deltaView"
+  ) => {
     const commodityKey = commodityKeyMap[globalSelectedCommodity].key;
     const sourceData = settledMode
       ? commodityOverviewData.settledDeltaChartData?.[commodityKey]
@@ -506,7 +528,7 @@ const OverviewTab = () => {
           );
           // Update news selection based on tab type
           const newsList = getNewsForDeltaCategory(selectedData.category);
-          
+
           if (tabType === "deltaView") {
             setDeltaViewNews(newsList);
             setDeltaViewNewsDate(selectedData.category);
@@ -528,12 +550,12 @@ const OverviewTab = () => {
           events: {
             dataPointSelection: handleDataPointSelection,
             markerClick: handleDataPointSelection,
-            click: function(event, chartContext, config) {
+            click: function (event, chartContext, config) {
               // Also handle direct clicks on the chart
               if (config?.dataPointIndex !== undefined) {
                 handleDataPointSelection(event, chartContext, config);
               }
-            }
+            },
           },
         },
         stroke: { curve: "stepline", width: 3, dashArray: [0, 5] },
@@ -562,10 +584,10 @@ const OverviewTab = () => {
         },
         grid: { borderColor: "#f1f1f1" },
         colors: settledMode ? ["#008FFB", "#FF4560"] : ["#008FFB", "#00E396"],
-        markers: { 
-          size: 6, 
+        markers: {
+          size: 6,
           hover: { size: 8 },
-          onClick: handleDataPointSelection
+          onClick: handleDataPointSelection,
         },
         legend: { position: "top" },
         tooltip: {
@@ -627,7 +649,7 @@ const OverviewTab = () => {
                 const durationBg =
                   news.impactDuration === "Long-term Impact"
                     ? "rgb(181, 255, 207)"
-                  : news.impactDuration === "Short-term Impact"
+                    : news.impactDuration === "Short-term Impact"
                     ? "rgba(255, 167, 157)"
                     : "rgb(255, 220, 151)";
 
@@ -967,9 +989,8 @@ const OverviewTab = () => {
   return (
     <div className="commodity-data mt-2">
       {/* Global Filters */}
-      <div className="global-cards mb-3">
-        <div className="d-flex justify-content-between align-items-center">
-          <p className="head-theme mb-0">Global Filters</p>
+      <div className=" mb-2">
+        <div className="d-flex justify-content-end align-items-center">
           <div className="d-flex gap-2 align-items-center">
             <Dropdown onSelect={setGlobalSelectedCommodity}>
               <Dropdown.Toggle variant="light" size="sm">
@@ -1106,13 +1127,17 @@ const OverviewTab = () => {
                 </div>
               </div>
               <div className="col-3">
-                <NewsCard 
+                <NewsCard
                   title={
-                    priceTrendNewsDate 
-                      ? `News for ${priceTrendNewsDate}` 
+                    priceTrendNewsDate
+                      ? `News for ${priceTrendNewsDate}`
                       : "All News"
-                  } 
-                  news={priceTrendNews.length > 0 ? priceTrendNews : (commodityOverviewData.newsData || [])} 
+                  }
+                  news={
+                    priceTrendNews.length > 0
+                      ? priceTrendNews
+                      : commodityOverviewData.newsData || []
+                  }
                 />
               </div>
             </div>
@@ -1141,72 +1166,79 @@ const OverviewTab = () => {
                 </div>
               </div>
               <div className="col-3">
-                <NewsCard 
+                <NewsCard
                   title={
-                    deltaViewNewsDate 
-                      ? `News for ${deltaViewNewsDate}` 
+                    deltaViewNewsDate
+                      ? `News for ${deltaViewNewsDate}`
                       : "All News"
-                  } 
-                  news={deltaViewNews.length > 0 ? deltaViewNews : (commodityOverviewData.newsData || [])} 
+                  }
+                  news={
+                    deltaViewNews.length > 0
+                      ? deltaViewNews
+                      : commodityOverviewData.newsData || []
+                  }
                 />
               </div>
             </div>
           </Tab>
 
           <Tab eventKey="ForecastedDelta" title="Forecasted Delta">
-  <div className="w-100 mb-2 global-cards mt-2" style={{ minHeight: "380px" }}>
-    {/* Heading and Filters */}
-    <div className="d-flex justify-content-between align-items-center mb-3 px-2">
-      <p className="head-theme">
-        Forecasted Delta -{" "}
-        {
-          commodityOptions.find(
-            (c) => c.key === globalSelectedCommodity
-          )?.label
-        }
-      </p>
-      <div className="d-flex gap-2">
-        <Dropdown onSelect={setForecastingDataBasis}>
-          <Dropdown.Toggle variant="light" size="sm">
-            {forecastingDataBasis}
-          </Dropdown.Toggle>
-          <Dropdown.Menu>
-            {[
-              "Monthly Data",
-              "Quarterly Data",
-              "Yearly Data",
-            ].map((basis) => (
-              <Dropdown.Item key={basis} eventKey={basis}>
-                {basis}
-              </Dropdown.Item>
-            ))}
-          </Dropdown.Menu>
-        </Dropdown>
-        <button
-          className="btn btn-theme global-font"
-          onClick={resetChartFilters}
-        >
-          Reset Chart
-        </button>
-      </div>
-    </div>
+            <div
+              className="w-100 mb-2 global-cards mt-2"
+              style={{ minHeight: "380px" }}
+            >
+              {/* Heading and Filters */}
+              <div className="d-flex justify-content-between align-items-center mb-3 px-2">
+                <p className="head-theme">
+                  Forecasted Delta -{" "}
+                  {
+                    commodityOptions.find(
+                      (c) => c.key === globalSelectedCommodity
+                    )?.label
+                  }
+                </p>
+                <div className="d-flex gap-2">
+                  <Dropdown onSelect={setForecastingDataBasis}>
+                    <Dropdown.Toggle variant="light" size="sm">
+                      {forecastingDataBasis}
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                      {["Monthly Data", "Quarterly Data", "Yearly Data"].map(
+                        (basis) => (
+                          <Dropdown.Item key={basis} eventKey={basis}>
+                            {basis}
+                          </Dropdown.Item>
+                        )
+                      )}
+                    </Dropdown.Menu>
+                  </Dropdown>
+                  <button
+                    className="btn btn-theme global-font"
+                    onClick={resetChartFilters}
+                  >
+                    Reset Chart
+                  </button>
+                </div>
+              </div>
 
-    {/* Chart - Full Width with Key to force re-render */}
-    <div style={{ padding: "0 10px", height: 350, width: "100%" }}>
-     <CanvasJSChart
-  key={`forecasted-delta-${activeChartTab}`}
-  options={forecastedDeltaOptions}
-  containerProps={{
-    style: {
-      width: "100%",
-      height: "100%",
-      position: "relative",
-    },
-  }}
-/>
-    </div>
-  </div>
-</Tab>
+              {/* Chart - Full Width with Key to force re-render */}
+              <div style={{ padding: "0 10px", height: 320, width: "100%" }}>
+                {" "}
+                {/* changed from 350 -> 320 */}
+                <CanvasJSChart
+                  key={`forecasted-delta-${activeChartTab}`}
+                  options={forecastedDeltaOptions}
+                  containerProps={{
+                    style: {
+                      width: "100%",
+                      height: "100%", // keep 100% so chart fills the 320px wrapper
+                      position: "relative",
+                    },
+                  }}
+                />
+              </div>
+            </div>
+          </Tab>
 
           <Tab eventKey="SettledDelta" title="Settled Delta">
             <div className="row g-2 mb-2">
@@ -1230,13 +1262,17 @@ const OverviewTab = () => {
                 </div>
               </div>
               <div className="col-3">
-                <NewsCard 
+                <NewsCard
                   title={
-                    settledDeltaNewsDate 
-                      ? `News for ${settledDeltaNewsDate}` 
+                    settledDeltaNewsDate
+                      ? `News for ${settledDeltaNewsDate}`
                       : "All News"
-                  } 
-                  news={settledDeltaNews.length > 0 ? settledDeltaNews : (commodityOverviewData.newsData || [])} 
+                  }
+                  news={
+                    settledDeltaNews.length > 0
+                      ? settledDeltaNews
+                      : commodityOverviewData.newsData || []
+                  }
                 />
               </div>
             </div>

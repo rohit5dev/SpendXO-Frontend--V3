@@ -99,7 +99,7 @@ const ChatWindow = ({
         <div className="sidebar-title">
           {isNavClosed && (
             <>
-            {/* Open sidenav bar */}
+              {/* Open sidenav bar */}
               <OverlayTrigger
                 key="bottom"
                 placement="bottom"
@@ -125,12 +125,12 @@ const ChatWindow = ({
               >
                 <div
                   className="sidenav-icon chat-icon ms-2 "
-                  style={{marginBottom: "1px"}}
+                  style={{ marginBottom: "1px" }}
                   onClick={() => {
                     !isLoading && onNewChat();
                   }}
                 >
-                  <BiMessageSquareAdd size="20px"/>
+                  <BiMessageSquareAdd size="20px" />
                 </div>
               </OverlayTrigger>
             </>
@@ -212,65 +212,83 @@ const ChatWindow = ({
                       {msg.text !==
                         "Request has been cancelled , Please try again!" && (
                         <div className="d-flex mb-0 align-items-center mt-3">
-                          <div className="avatar">
+                          {/* <div className="avatar">
                             <img src={xoImg} alt=" Avatar" />
-                          </div>
-                          <h4>Answer</h4>
+                          </div> */}
+                          {/* <h4>Answer</h4> */}
                         </div>
                       )}
-                      <div className="row g-3">
-                        <div className="col-12 mt-4">
-                          <Markdown>{msg.text}</Markdown>
-                          <div className="d-flex align-items-center justify-content-between mb-5 mt-2">
-                            <div className="d-flex">
-                              <OverlayTrigger
-                                placement="bottom"
-                                overlay={
-                                  <Tooltip style={{ fontSize: "12px" }}>
-                                    Copy
-                                  </Tooltip>
-                                }
-                              >
-                                <button
-                                  className="bot-icon"
-                                  data-toggle="tooltip"
-                                  title="Copy"
-                                  onClick={() => handleCopy(msg.text)}
-                                >
-                                  <IoCopyOutline />
-                                </button>
-                              </OverlayTrigger>
-                              {msg.sender === "bot" && (
+                      <div className="d-flex">
+                        <div
+                          className="avatar flex-shrink-0"
+                          style={{ width: "30px", height: "30px" }}
+                        >
+                          <img
+                            src={xoImg}
+                            alt="Avatar"
+                            className="img-fluid rounded-circle"
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                            }}
+                          />
+                        </div>
+
+                        <div className="row g-3">
+                          <div className="col-12 mt-4">
+                            <Markdown>{msg.text}</Markdown>
+                            <div className="d-flex align-items-center justify-content-between mb-5 mt-2">
+                              <div className="d-flex">
                                 <OverlayTrigger
                                   placement="bottom"
                                   overlay={
                                     <Tooltip style={{ fontSize: "12px" }}>
-                                      Regenerate
+                                      Copy
                                     </Tooltip>
                                   }
                                 >
                                   <button
                                     className="bot-icon"
-                                    onClick={() =>
-                                      onRetryMessage(msg.text, index)
-                                    }
+                                    data-toggle="tooltip"
+                                    title="Copy"
+                                    onClick={() => handleCopy(msg.text)}
                                   >
-                                    <LuRefreshCcw />
+                                    <IoCopyOutline />
                                   </button>
                                 </OverlayTrigger>
-                              )}
+                                {msg.sender === "bot" && (
+                                  <OverlayTrigger
+                                    placement="bottom"
+                                    overlay={
+                                      <Tooltip style={{ fontSize: "12px" }}>
+                                        Regenerate
+                                      </Tooltip>
+                                    }
+                                  >
+                                    <button
+                                      className="bot-icon"
+                                      onClick={() =>
+                                        onRetryMessage(msg.text, index)
+                                      }
+                                    >
+                                      <LuRefreshCcw />
+                                    </button>
+                                  </OverlayTrigger>
+                                )}
+                              </div>
+                              <div>
+                                {timeDifference && (
+                                  <small className="text-secondary ms-2">
+                                    {timeDifference.toFixed(1)} sec
+                                  </small>
+                                )}
+                              </div>
                             </div>
-                            <div>
-                              {timeDifference && (
-                                <small className="text-secondary ms-2">
-                                  {timeDifference.toFixed(1)} sec
-                                </small>
-                              )}
-                            </div>
+                            {/* separation between 2 responses */}
+                            {messages?.length > 2 &&
+                              index !== messages.length - 1 && <hr />}
                           </div>
-                          {/* separation between 2 responses */}
-                          {messages?.length > 2 &&
-                            index !== messages.length - 1 && <hr />}
                         </div>
                       </div>
                     </div>
@@ -286,7 +304,9 @@ const ChatWindow = ({
                   className="spinner-border spinner-border-sm text-dark "
                   role="status"
                 ></div>
-                <p className="mt-2 text-dark">{loadingMessage}</p>
+                {loadingMessage && (
+                  <p className="mt-2 text-dark">Thinking...</p>
+                )}
               </div>
             )}
 
