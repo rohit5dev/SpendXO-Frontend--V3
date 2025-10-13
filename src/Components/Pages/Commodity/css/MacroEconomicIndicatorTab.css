@@ -1,0 +1,63 @@
+.macro-filters {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 20px;
+  align-items: flex-end;
+}
+
+.macro-filters .form-group {
+  min-width: 100px;
+}
+
+.kp-text {
+  margin: 0;
+  font-size: 12px;
+}
+
+.macro-kpi-container {
+  display: flex;
+  text-align: left;
+  gap: 10px;
+}
+
+.macro-kpi-box {
+  padding: 10px 20px;
+  background-color: white;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  font-size: 12px;
+  flex: 1;
+}
+
+.macro-kpi-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: #2c3e62;
+  margin-bottom: 5px;
+  text-align: left;
+}
+
+.macro-kpi-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1565c0;
+  letter-spacing: 0.03em;
+  margin-bottom: 0;
+  text-align: left;
+}
+
+@media (max-width: 1050px) {
+  .macro-kpi-container {
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+  .macro-kpi-box {
+    width: 100%;
+    min-width: unset;
+  }
+  .macro-filters {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+}
