@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from "react";
-import { Form } from "react-bootstrap";
+import { useState, useMemo } from "react";
+import { Form, Row, Col, Card, Table, Button } from "react-bootstrap";
 import Chart from "react-apexcharts";
 import "../css/PriceDecompositionTab.css";
 import { rawDecompData } from "../Data/PriceDecompData";
@@ -81,7 +81,13 @@ const PriceDecompositionTab = () => {
 
   const chartData = useMemo(
     () => ({
-      dates: filteredData.map((item) => item.Date.split(" ")[0]),
+      dates: filteredData.map((item) => {
+        const date = new Date(item.Date);
+        const day = date.getDate().toString().padStart(2, "0");
+        const month = date.toLocaleString("en-US", { month: "short" });
+        const year = date.getFullYear();
+        return `${day} ${month} ${year}`;
+      }),
       priceActual: filteredData.map((item) => item["Close Price"] || null),
       priceForecasted: filteredData.map(
         (item) => item["Forecasted Price"] || null
@@ -161,7 +167,7 @@ const PriceDecompositionTab = () => {
       });
   }, [filteredData]);
 
-  const chartOptions = (colors, label) => ({
+  const chartOptions = (colors, label, showLegend = false) => ({
     chart: {
       type: "line",
       toolbar: { show: false },
@@ -171,14 +177,23 @@ const PriceDecompositionTab = () => {
     },
     xaxis: {
       categories: chartData.dates,
-      labels: { fontSize: "10px", rotate: 0 },
+      labels: { show: false },
       tickAmount: 10,
     },
-    yaxis: { labels: { fontSize: "10px" } },
+    yaxis: {
+      labels: {
+        fontSize: "8px",
+        formatter: (value) => {
+          return Math.abs(value) >= 1000
+            ? `${(value / 1000).toFixed(1)}k`
+            : value;
+        },
+      },
+    },
     stroke: { curve: "smooth", width: 2 },
     colors,
     legend: {
-      show: true,
+      show: showLegend,
       fontSize: "11px",
       position: "top",
       horizontalAlign: "center",
@@ -187,363 +202,407 @@ const PriceDecompositionTab = () => {
     grid: { borderColor: "#f0f0f0", strokeDashArray: 3 },
     dataLabels: { enabled: false },
     tooltip: { enabled: true, shared: true },
-    title: { text: label, align: "center", style: { fontSize: 14 } },
   });
 
+  const resetFilters = () => {
+    setYear("All");
+    setMonth("All");
+    setQuarter("All");
+    setCommodityGroup("All");
+    setCommodityName("HRC");
+    setRegion("All");
+  };
+
   return (
-    <div className="price-decomp-tab-root">
-      <div className="global-filters">
-        {[
-          ["Year", year, setYear, filterOptions.years],
-          ["Month", month, setMonth, filterOptions.months],
-          ["Quarter", quarter, setQuarter, filterOptions.quarters],
-          [
-            "Commodity Group",
-            commodityGroup,
-            setCommodityGroup,
-            filterOptions.commodityGroups,
-          ],
-          [
-            "Commodity Name",
-            commodityName,
-            setCommodityName,
-            filterOptions.commodityNames,
-          ],
-          ["Region", region, setRegion, filterOptions.regions],
-        ].map(([label, val, setter, options]) => (
-          <Form.Group className="global-filter-input" key={label}>
-            <Form.Label className="global-filter-label kp-text">
-              {label}
-            </Form.Label>
-            <Form.Select
-              value={val}
-              onChange={(e) => setter(e.target.value)}
-              className="kp-text"
-              style={{ fontSize: "12px", minWidth: 112 }}
-            >
-              {options.map((x) => (
-                <option key={x} value={x}>
-                  {x}
-                </option>
-              ))}
-            </Form.Select>
-          </Form.Group>
-        ))}
+    <div className="container-fluid p-0">
+      {/* Filters */}
+      <div className="d-flex gap-2 mb-2 align-items-end">
+        <Form.Group className="global-filter-input">
+          <Form.Label className="global-filter-label">Year</Form.Label>
+          <Form.Select
+            value={year}
+            onChange={(e) => setYear(e.target.value)}
+            style={{ fontSize: "11px" }}
+          >
+            {filterOptions.years.map((x) => (
+              <option key={x} value={x}>
+                {x}
+              </option>
+            ))}
+          </Form.Select>
+        </Form.Group>
+
+        <Form.Group className="global-filter-input">
+          <Form.Label className="global-filter-label">Month</Form.Label>
+          <Form.Select
+            value={month}
+            onChange={(e) => setMonth(e.target.value)}
+            style={{ fontSize: "11px" }}
+          >
+            {filterOptions.months.map((x) => (
+              <option key={x} value={x}>
+                {x}
+              </option>
+            ))}
+          </Form.Select>
+        </Form.Group>
+
+        <Form.Group className="global-filter-input">
+          <Form.Label className="global-filter-label">Quarter</Form.Label>
+          <Form.Select
+            value={quarter}
+            onChange={(e) => setQuarter(e.target.value)}
+            style={{ fontSize: "11px" }}
+          >
+            {filterOptions.quarters.map((x) => (
+              <option key={x} value={x}>
+                {x}
+              </option>
+            ))}
+          </Form.Select>
+        </Form.Group>
+
+        <Form.Group className="global-filter-input">
+          <Form.Label className="global-filter-label">
+            Commodity Group
+          </Form.Label>
+          <Form.Select
+            value={commodityGroup}
+            onChange={(e) => setCommodityGroup(e.target.value)}
+            style={{ fontSize: "11px" }}
+          >
+            {filterOptions.commodityGroups.map((x) => (
+              <option key={x} value={x}>
+                {x}
+              </option>
+            ))}
+          </Form.Select>
+        </Form.Group>
+
+        <Form.Group className="global-filter-input">
+          <Form.Label className="global-filter-label">
+            Commodity Name
+          </Form.Label>
+          <Form.Select
+            value={commodityName}
+            onChange={(e) => setCommodityName(e.target.value)}
+            style={{ fontSize: "11px" }}
+          >
+            {filterOptions.commodityNames.map((x) => (
+              <option key={x} value={x}>
+                {x}
+              </option>
+            ))}
+          </Form.Select>
+        </Form.Group>
+
+        <Form.Group className="global-filter-input">
+          <Form.Label className="global-filter-label">Region</Form.Label>
+          <Form.Select
+            value={region}
+            onChange={(e) => setRegion(e.target.value)}
+            style={{ fontSize: "11px" }}
+          >
+            {filterOptions.regions.map((x) => (
+              <option key={x} value={x}>
+                {x}
+              </option>
+            ))}
+          </Form.Select>
+        </Form.Group>
+
+        <button className="btn btn-theme global-font" onClick={resetFilters}>
+          Reset All
+        </button>
       </div>
 
-      <div className="decomp-top-kpis-row">
-        <div className="kpi-box">
-          <div
-            className="kp-text kpi-title"
-            style={{ marginBottom: 4, color: "#31846a" }}
-          >
-            Commodity
+      {/* Top KPIs Row */}
+      <Row className="g-2 mb-2">
+        <Col>
+          <div className="global-cards p-2 flex-fill text-start">
+            <p className="head-theme small text-muted mb-0">Commodity</p>
+            <p className="global-font fw-semibold mb-0 mt-0">{commodityName}</p>
           </div>
-          <div className="kp-text kpi-large">{commodityName}</div>
-        </div>
-        <div className="kpi-box">
-          <div className="kp-text kpi-title">Current Delta</div>
-        </div>
-        <div className="kpi-box">
-          <div className="kp-text kpi-title">Month</div>
-          <div
-            className="kp-text"
-            style={{ fontSize: "14px", fontWeight: 600 }}
-          >
-            ₹0.10 /Kg | Aug'25
+        </Col>
+        <Col>
+          <div className="global-cards p-2 flex-fill text-start">
+            <p className="head-theme small text-muted mb-0">Current Delta</p>
+            <p className="global-font fw-semibold mb-0 mt-0">--</p>
           </div>
-        </div>
-        <div className="kpi-box">
-          <div className="kp-text kpi-title">Quarter</div>
-          <div
-            className="kp-text"
-            style={{ fontSize: "14px", fontWeight: 600 }}
-          >
-            ₹-1.34 | Jul-Sep'25
+        </Col>
+        <Col>
+          <div className="global-cards p-2 flex-fill text-start">
+            <p className="head-theme small text-muted mb-0">Month</p>
+            <p className="global-font fw-semibold mb-0 mt-0">
+              ₹0.10 /Kg | Aug'25
+            </p>
           </div>
-        </div>
-        <div className="kpi-box">
-          <div className="kp-text kpi-title">Steel Production (MT)</div>
-          <div
-            className="kp-text"
-            style={{ fontSize: "14px", fontWeight: 600 }}
-          >
-            108.32
-            <span style={{ color: "#d9334f", fontSize: "11px", marginLeft: 4 }}>
-              ▼ -24.69% YoY Change (24–25)
-            </span>
+        </Col>
+        <Col>
+          <div className="global-cards p-2 flex-fill text-start">
+            <p className="head-theme small text-muted mb-0">Quarter</p>
+            <p className="global-font fw-semibold mb-0 mt-0">
+              ₹-1.34 | Jul-Sep'25
+            </p>
           </div>
-        </div>
-        <div className="kpi-box">
-          <div className="kp-text kpi-title">Steel Consumption (MT)</div>
-          <div
-            className="kp-text"
-            style={{ fontSize: "14px", fontWeight: 600 }}
-          >
-            110.91
-            <span style={{ color: "#d9334f", fontSize: "11px", marginLeft: 4 }}>
-              ▼ -24.93% YoY Change (24–25)
-            </span>
+        </Col>
+        <Col>
+          <div className="global-cards p-2 flex-fill text-start">
+            <p className="head-theme small text-muted mb-0">
+              Steel Production (MT)
+            </p>
+            <p className="global-font fw-semibold mb-0 mt-0">
+              108.32
+              <span className="text-danger ms-1">▼ -24.69% YoY Change</span>
+            </p>
           </div>
-        </div>
-      </div>
+        </Col>
+        <Col>
+          <div className="global-cards p-2 flex-fill text-start">
+            <p className="head-theme small text-muted mb-0">
+              Steel Consumption (MT)
+            </p>
+            <p className="global-font fw-semibold mb-0 mt-0">
+              110.91
+              <span className="text-danger ms-1">▼ -24.93% YoY Change</span>
+            </p>
+          </div>
+        </Col>
+      </Row>
 
-      <div className="decomposition-main-row">
-        <div className="decomp-col">
-          <div className="decomp-section">
-            <div
-              className="kp-text kpi-title decomp-c-title"
-              style={{ fontSize: 17 }}
-            >
-              Decomposition Component
-            </div>
-            <div
-              className="decomp-desc kp-text"
-              style={{ whiteSpace: "pre-line" }}
-            >
-              • Trend: Long-term movement ... • Seasonality: ... • Residual: ...
-              {"\n\n"}Multiplicative Model: HRC Price = Trend × Seasonality ×
-              Residual
-            </div>
-            <div>
-              <div className="decomp-table-title kp-text">
-                Price Decomposition Table
-                <button className="view-history-btn">
-                  View Historic Decomposition
-                </button>
-              </div>
+      {/* Main Content Row */}
+      <Row className="g-2">
+        {/* Left Column - Decomposition Components */}
+        <div className="col-md-5">
+          <div className="global-cards mb-2">
+            <div className="global-font text-start">
+              <p className="head-theme text-start mb-2">
+                Decomposition Component
+              </p>
               <div
-                style={{
-                  border: "1px solid #ecedf2",
-                  borderRadius: 6,
-                  overflow: "auto",
-                  maxHeight: 220,
-                }}
+                className="small text-secondary mb-3"
+                style={{ whiteSpace: "pre-line" }}
               >
-                <table className="decomp-table">
-                  <thead>
-                    <tr>
-                      <th className="kp-text">Year</th>
-                      <th className="kp-text">Month</th>
-                      <th className="kp-text">Forecasted Price</th>
-                      <th className="kp-text">Forecasted Trend</th>
-                      <th className="kp-text">Forecasted Seasonality</th>
-                      <th className="kp-text">Forecasted Residual</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {tableData.map((row, idx) => (
-                      <tr key={idx}>
-                        <td className="kp-text">{row.year}</td>
-                        <td className="kp-text">{row.month}</td>
-                        <td className="kp-text">{row.forecastedPrice}</td>
-                        <td className="kp-text">{row.forecastedTrend}</td>
-                        <td className="kp-text">{row.forecastedSeasonality}</td>
-                        <td className="kp-text">{row.forecastedResidual}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                • <b>Trend:</b> Long-term movement in the data, showing the
+                overall direction (upward, downward, or flat) over time.
+                {"\n"}• <b>Seasonality:</b> Regular, predictable patterns or
+                fluctuations in the data due to seasonal factors.
+                {"\n"}• <b>Residuals:</b> Irregular, random variations in the
+                data that cannot be explained by trend or seasonality.
+                {"\n\n"} <b>Multiplicative Model</b>
+                <br /> HRC Price = Trend × Seasonality × Residual
+                <br />
+                This model assumes that all parts are connected, so a change in
+                one causes proportional changes in the others.
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="charts-col">
-          <div className="main-chart-wrapper">
-            <div className="kp-text kpi-title chart-title">HRC Price</div>
-            <Chart
-              options={chartOptions(["#2491f7", "#24ea5d"], "HRC Price")}
-              series={[
-                { name: "Actual", data: chartData.priceActual },
-                { name: "Forecasted", data: chartData.priceForecasted },
-              ]}
-              type="line"
-              height={220}
-            />
-          </div>
-          {[
-            [
-              "Trend",
-              chartData.trend,
-              chartData.trendForecasted,
-              "#6386d8",
-              "#b0bdf4",
-            ],
-            [
-              "Seasonality",
-              chartData.seasonality,
-              chartData.seasonalityForecasted,
-              "#98ccfd",
-              "#90caf9",
-            ],
-            [
-              "Residuals",
-              chartData.residual,
-              chartData.residualForecasted,
-              "#9cb8c9",
-              "#c9e4f5",
-            ],
-          ].map(([label, seriesA, seriesB, colA, colB], idx) => (
+          <div className="global-cards">
+            <p className="head-theme text-start mb-2">
+              Price Decomposition Table
+            </p>
+            {/* <div className="btn global-font">
+              Historic Decomposition
+            </div> */}
+
             <div
-              className="component-chart-item"
-              key={label}
-              style={{ marginBottom: 8 }}
+              className="table-container my-2"
+              style={{
+                overflowX: "auto",
+                overflowY: "auto",
+              }}
             >
-              <div className="kp-text kpi-title chart-title">{label}</div>
-              <Chart
-                options={chartOptions([colA, colB], label)}
-                series={[
-                  { name: label, data: seriesA },
-                  { name: "Forecasted", data: seriesB },
-                ]}
-                type="line"
-                height={115}
-              />
+              <table className="table table-bordered table-sm m-0">
+                <thead className="table-light sticky-top">
+                  <tr style={{ backgroundColor: "#bfe1e5" }}>
+                    <th className="text-start defaultStyleHead">Year</th>
+                    <th className="text-start defaultStyleHead">Month</th>
+                    <th className="text-start defaultStyleHead">
+                      Forecasted Price
+                    </th>
+                    <th className="text-start defaultStyleHead">
+                      Forecasted Trend
+                    </th>
+                    <th className="text-start defaultStyleHead">
+                      Forecasted Seasonality
+                    </th>
+                    <th className="text-start defaultStyleHead">
+                      Forecasted Residual
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {tableData.map((row, idx) => (
+                    <tr key={idx}>
+                      <td className="defaultStyles">{row.year}</td>
+                      <td className="defaultStyles">{row.month}</td>
+                      <td className="defaultStyles">{row.forecastedPrice}</td>
+                      <td className="defaultStyles">{row.forecastedTrend}</td>
+                      <td className="defaultStyles">
+                        {row.forecastedSeasonality}
+                      </td>
+                      <td className="defaultStyles">
+                        {row.forecastedResidual}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          ))}
+          </div>
         </div>
 
-        <div className="kpi-col">
+        {/* Middle Column - Charts */}
+        <div className="col-md-6">
+          <div className="mb-2">
+            <div className="global-cards h-100 p-0 d-flex flex-column">
+              <p className="head-theme text-start m-2  mb-0">HRC Price</p>
+
+              <div className="flex-grow-1">
+                <Chart
+                  options={chartOptions(
+                    ["#2491f7", "#24ea5d"],
+                    "HRC Price",
+                    true
+                  )}
+                  series={[
+                    { name: "Actual", data: chartData.priceActual },
+                    { name: "Forecasted", data: chartData.priceForecasted },
+                  ]}
+                  type="line"
+                  height={100}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="mb-2">
+            <div className="global-cards h-100 p-0 d-flex flex-column">
+              <p className="head-theme text-start m-2  mb-0">Trend</p>
+
+              <div className="flex-grow-1">
+                <Chart
+                  options={chartOptions(["#2491f7", "#24ea5d"], "Trend")}
+                  series={[
+                    { name: "Actual", data: chartData.trend },
+                    { name: "Forecasted", data: chartData.trendForecasted },
+                  ]}
+                  type="line"
+                  height={100}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="mb-2">
+            <div className="global-cards h-100 p-0 d-flex flex-column">
+              <p className="head-theme text-start m-2 mb-0">Seasonality</p>
+
+              <div className="flex-grow-1">
+                <Chart
+                  options={chartOptions(["#2491f7", "#24ea5d"], "Seasonality")}
+                  series={[
+                    { name: "Actual", data: chartData.seasonality },
+                    {
+                      name: "Forecasted",
+                      data: chartData.seasonalityForecasted,
+                    },
+                  ]}
+                  type="line"
+                  height={100}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="">
+            <div className="global-cards h-100 p-0 d-flex flex-column">
+              <p className="head-theme text-start m-2  mb-0">Residuals</p>
+
+              <div className="flex-grow-1">
+                <Chart
+                  options={chartOptions(["#2491f7", "#24ea5d"], "Residuals")}
+                  series={[
+                    { name: "Actual", data: chartData.residual },
+                    {
+                      name: "Forecasted",
+                      data: chartData.residualForecasted,
+                    },
+                  ]}
+                  type="line"
+                  height={100}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column - KPIs */}
+        <div className="col-md-1">
           {kpis && (
-            <div className="decomp-right-kpi-panel">
-              <div className="kpi-side-panel-card">
-                <div
-                  className="kp-text"
-                  style={{ fontWeight: 700, color: "#22A06B", fontSize: 18 }}
-                >
+            <div className="d-grid gap-2">
+              <div className="global-cards p-2 flex-fill text-start">
+                <p className="head-theme small text-muted mb-0">Price Trend</p>
+                <p className="global-font fw-semibold mb-0 mt-0 text-success">
                   {kpis.trend}
-                </div>
-                <div
-                  className="kp-text"
-                  style={{
-                    color: "#22A06B",
-                    fontWeight: 600,
-                    fontSize: 12,
-                    marginTop: 2,
-                  }}
-                >
-                  Price Trend
-                </div>
+                </p>
               </div>
-              <div className="kpi-side-panel-card">
-                <div
-                  className="kp-text"
-                  style={{ fontWeight: 700, color: "#d9334f", fontSize: 18 }}
-                >
-                  {kpis.overallChange}%
-                </div>
-                <div
-                  className="kp-text"
-                  style={{
-                    color: "#d9334f",
-                    fontWeight: 600,
-                    fontSize: 12,
-                    marginTop: 2,
-                  }}
-                >
+
+              <div className="global-cards p-2 flex-fill text-start">
+                <p className="head-theme small text-muted mb-0">
                   Overall % Change
-                </div>
+                </p>
+                <p className="global-font fw-semibold mb-0 mt-0 text-danger">
+                  {kpis.overallChange}%
+                </p>
               </div>
-              <div className="kpi-side-panel-card">
-                <div
-                  className="kp-text"
-                  style={{ fontWeight: 700, color: "#22A06B", fontSize: 16 }}
-                >
-                  {kpis.increaseCount}
-                </div>
-                <div
-                  className="kp-text"
-                  style={{
-                    color: "#22A06B",
-                    fontWeight: 600,
-                    fontSize: 12,
-                    marginTop: 2,
-                  }}
-                >
+
+              <div className="global-cards p-2 flex-fill text-start">
+                <p className="head-theme small text-muted mb-0">
                   Price Incr. Occur
-                </div>
+                </p>
+                <p className="global-font fw-semibold mb-0 mt-0 text-success">
+                  {kpis.increaseCount}
+                </p>
               </div>
-              <div className="kpi-side-panel-card">
-                <div
-                  className="kp-text"
-                  style={{ fontWeight: 700, color: "#d9334f", fontSize: 16 }}
-                >
-                  {kpis.decreaseCount}
-                </div>
-                <div
-                  className="kp-text"
-                  style={{
-                    color: "#d9334f",
-                    fontWeight: 600,
-                    fontSize: 12,
-                    marginTop: 2,
-                  }}
-                >
+
+              <div className="global-cards p-2 flex-fill text-start">
+                <p className="head-theme small text-muted mb-0">
                   Price Decr. Occur
-                </div>
+                </p>
+                <p className="global-font fw-semibold mb-0 mt-0 text-danger">
+                  {kpis.decreaseCount}
+                </p>
               </div>
-              <div className="kpi-side-panel-card">
-                <div
-                  className="kp-text"
-                  style={{ fontWeight: 700, color: "#444", fontSize: 16 }}
-                >
-                  {kpis.noChangeCount}
-                </div>
-                <div
-                  className="kp-text"
-                  style={{
-                    color: "#444",
-                    fontWeight: 600,
-                    fontSize: 12,
-                    marginTop: 2,
-                  }}
-                >
+
+              <div className="global-cards p-2 flex-fill text-start">
+                <p className="head-theme small text-muted mb-0">
                   No Change Occur
-                </div>
+                </p>
+                <p className="global-font fw-semibold mb-0 mt-0">
+                  {kpis.noChangeCount}
+                </p>
               </div>
-              <div className="kpi-side-panel-card">
-                <div
-                  className="kp-text"
-                  style={{ fontWeight: 700, color: "#444", fontSize: 16 }}
-                >
-                  {kpis.seasonalVariation}
-                </div>
-                <div
-                  className="kp-text"
-                  style={{
-                    color: "#444",
-                    fontWeight: 600,
-                    fontSize: 12,
-                    marginTop: 2,
-                  }}
-                >
+
+              <div className="global-cards p-2 flex-fill text-start">
+                <p className="head-theme small text-muted mb-0">
                   Seasonal Variation
-                </div>
+                </p>
+                <p className="global-font fw-semibold mb-0 mt-0">
+                  {kpis.seasonalVariation}
+                </p>
               </div>
-              <div className="kpi-side-panel-card">
-                <div
-                  className="kp-text"
-                  style={{ fontWeight: 700, color: "#444", fontSize: 16 }}
-                >
-                  {kpis.maxSeasonality}
-                </div>
-                <div
-                  className="kp-text"
-                  style={{
-                    color: "#444",
-                    fontWeight: 600,
-                    fontSize: 12,
-                    marginTop: 2,
-                  }}
-                >
+
+              <div className="global-cards p-2 flex-fill text-start">
+                <p className="head-theme small text-muted mb-0">
                   Max +ve Variation
-                </div>
+                </p>
+                <p className="global-font fw-semibold mb-0 mt-0">
+                  {kpis.maxSeasonality}
+                </p>
               </div>
             </div>
           )}
         </div>
-      </div>
+      </Row>
     </div>
   );
 };

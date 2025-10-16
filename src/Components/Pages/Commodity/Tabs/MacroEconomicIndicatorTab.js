@@ -21,11 +21,17 @@ const MacroEconomicIndicatorTab = () => {
   const [commodityName, setCommodityName] = useState("HRC");
   const [region, setRegion] = useState("All");
 
+  const resetFilters = () => {
+    setCommodityGroup("All");
+    setCommodityName("HRC");
+    setRegion("All");
+  };
+
   // KPIs update reactively based on commodityName selection
   const kpiData = getKPIs(commodityName);
 
   return (
-    <div className="p-2">
+    <div className="">
       {/* Filters - Single Row */}
       <div className="d-flex text-start  gap-2 mb-2">
         <div className="">
@@ -68,9 +74,7 @@ const MacroEconomicIndicatorTab = () => {
         </div>
         <div className="2">
           <Form.Group className="global-filter-input">
-            <Form.Label className="global-filter-label">
-              Region
-            </Form.Label>
+            <Form.Label className="global-filter-label">Region</Form.Label>
             <Form.Select
               value={region}
               onChange={(e) => setRegion(e.target.value)}
@@ -84,6 +88,11 @@ const MacroEconomicIndicatorTab = () => {
               ))}
             </Form.Select>
           </Form.Group>
+        </div>
+        <div className="d-flex align-items-end">
+          <button className="btn btn-theme global-font" onClick={resetFilters}>
+            Reset All
+          </button>
         </div>
       </div>
 
@@ -103,7 +112,10 @@ const MacroEconomicIndicatorTab = () => {
         ))}
         {/* All other main KPI cards */}
         {KPI_META.map((kpi, idx) => (
-          <div key={kpi.label} className="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
+          <div
+            key={kpi.label}
+            className="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6"
+          >
             <div className="global-cards h-100 p-2">
               <p className="kpi-label small fw-medium mb-1 text-truncate">
                 {kpi.label}
@@ -136,15 +148,15 @@ const MacroEconomicIndicatorTab = () => {
                   />
                 </div>
                 <p className="small text-muted mt-2 mb-0">
-                  *This correlation matrix is shared for both HRC and CRC and shows
-                  how each is statistically related to each other as well as other
-                  economic indicators
+                  *This correlation matrix is shared for both HRC and CRC and
+                  shows how each is statistically related to each other as well
+                  as other economic indicators
                 </p>
               </div>
             </div>
           </div>
         </div>
-        
+
         {/* Right two stacked charts */}
         <div className="col-xxl-4 col-xl-5 col-lg-6">
           <div className="row g-2 h-100">
@@ -154,10 +166,10 @@ const MacroEconomicIndicatorTab = () => {
                   <h6 className="card-title fw-semibold mb-2">
                     Finished Steel Surplus/Deficit Over Time - India
                   </h6>
-                  <Chart 
-                    options={options} 
-                    series={series} 
-                    type="line" 
+                  <Chart
+                    options={options}
+                    series={series}
+                    type="line"
                     height={200}
                     width="100%"
                   />

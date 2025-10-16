@@ -114,10 +114,16 @@ const DeltaDecomposition = () => {
     ],
   };
 
+  const resetFilters = () => {
+    setCommodityGroup("All");
+    setCommodityName("HRC");
+    setRegion("All");
+  };
+
   return (
     <div>
       {/* FILTERS */}
-      <div className=" d-flex gap-2  my-2" style={{ width: 400 }}>
+      <div className="d-flex gap-2 mb-2 align-items-end">
         <Form.Group className="global-filter-input">
           <Form.Label className="global-filter-label">
             Commodity Group
@@ -166,17 +172,55 @@ const DeltaDecomposition = () => {
             ))}
           </Form.Select>
         </Form.Group>
+
+        <button className="btn btn-theme global-font" onClick={resetFilters}>
+          Reset All
+        </button>
       </div>
 
       {/* KPI Cards */}
-      <div className="kpi-container d-flex gap-2 mb-2 mt-0 ">
-        {currentKPIData.map((kpi, idx) => (
-          <div className="kpi-box" key={idx}>
-            <p className="kp-text">{kpi.label}</p>
-            <p className="kp-text">{kpi.value}</p>
+      <Row className="g-2 mb-2">
+        <Col>
+          <div className="global-cards p-2 flex-fill text-start">
+            <p className="head-theme small text-muted mb-0">Commodity</p>
+            <p className="global-font fw-semibold mb-0 mt-0">{commodityName}</p>
           </div>
-        ))}
-      </div>
+        </Col>
+        <Col>
+          <div className="global-cards p-2 flex-fill text-start">
+            <p className="head-theme small text-muted mb-0">Delta</p>
+            <p className="global-font fw-semibold mb-0 mt-0">
+              ₹ 1.14 Rs/Kg | Q2 2025
+            </p>
+          </div>
+        </Col>
+        <Col>
+          <div className="global-cards p-2 flex-fill text-start">
+            <p className="head-theme small text-muted mb-0">
+              Last Quarter Close Price
+            </p>
+            <p className="global-font fw-semibold mb-0 mt-0">
+              ₹ 52,550 | Mar–2025
+            </p>
+          </div>
+        </Col>
+        <Col>
+          <div className="global-cards p-2 flex-fill text-start">
+            <p className="head-theme small text-muted mb-0">
+              Q1-2025 (Jan-Mar)
+            </p>
+            <p className="global-font fw-semibold mb-0 mt-0">—</p>
+          </div>
+        </Col>
+        <Col>
+          <div className="global-cards p-2 flex-fill text-start">
+            <p className="head-theme small text-muted mb-0">
+              Q2-2025 (Apr-Jun)
+            </p>
+            <p className="global-font fw-semibold mb-0 mt-0">—</p>
+          </div>
+        </Col>
+      </Row>
 
       {/* Insights Row */}
       <Row className="gx-2">

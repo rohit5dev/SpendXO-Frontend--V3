@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback, useMemo } from "react";
 import Chart from "react-apexcharts";
-import { Dropdown, Tabs, Tab } from "react-bootstrap";
+import { Dropdown, Tabs, Tab, Form } from "react-bootstrap";
 import "../css/CommodityIntelligenceNew.css";
 import "leaflet/dist/leaflet.css";
 import { commodityOverviewData } from "../Data/overviewData";
@@ -987,75 +987,144 @@ const OverviewTab = () => {
   );
 
   return (
-    <div className="commodity-data mt-2">
+    <div className="commodity-data ">
       {/* Global Filters */}
-      <div className=" mb-2">
-        <div className="d-flex justify-content-end align-items-center">
-          <div className="d-flex gap-2 align-items-center">
-            <Dropdown onSelect={setGlobalSelectedCommodity}>
-              <Dropdown.Toggle variant="light" size="sm">
-                {commodityOptions.find((c) => c.key === globalSelectedCommodity)
-                  ?.label || "Select Commodity"}
-              </Dropdown.Toggle>
-              <Dropdown.Menu>
-                {commodityOptions.map((commodity) => (
-                  <Dropdown.Item key={commodity.key} eventKey={commodity.key}>
-                    {commodity.label}
-                  </Dropdown.Item>
-                ))}
-              </Dropdown.Menu>
-            </Dropdown>
+      <div className="d-flex gap-2 mb-2 align-items-end">
+        <Form.Group className="global-filter-input">
+          <Form.Label className="global-filter-label">Commodity</Form.Label>
+          <Form.Select
+            value={globalSelectedCommodity}
+            onChange={(e) => setGlobalSelectedCommodity(e.target.value)}
+            style={{ fontSize: "11px" }}
+          >
+            {commodityOptions.map((commodity) => (
+              <option key={commodity.key} value={commodity.key}>
+                {commodity.label}
+              </option>
+            ))}
+          </Form.Select>
+        </Form.Group>
 
-            <Dropdown onSelect={setGlobalSelectedYear}>
-              <Dropdown.Toggle variant="light" size="sm">
-                {globalSelectedYear}
-              </Dropdown.Toggle>
-              <Dropdown.Menu>
-                {uniqueYears.map((year, index) => (
-                  <Dropdown.Item key={index} eventKey={year}>
-                    {year}
-                  </Dropdown.Item>
-                ))}
-              </Dropdown.Menu>
-            </Dropdown>
+        <Form.Group className="global-filter-input">
+          <Form.Label className="global-filter-label">Year</Form.Label>
+          <Form.Select
+            value={globalSelectedYear}
+            onChange={(e) => setGlobalSelectedYear(e.target.value)}
+            style={{ fontSize: "11px" }}
+          >
+            {uniqueYears.map((year, index) => (
+              <option key={index} value={year}>
+                {year}
+              </option>
+            ))}
+          </Form.Select>
+        </Form.Group>
 
-            <button
-              className="btn btn-theme global-font"
-              onClick={resetAllFilters}
-            >
-              Reset All
-            </button>
-          </div>
-        </div>
+        <Form.Group className="global-filter-input">
+          <Form.Label className="global-filter-label">Data Basis</Form.Label>
+          <Form.Select
+            value={forecastingDataBasis}
+            onChange={(e) => setForecastingDataBasis(e.target.value)}
+            style={{ fontSize: "11px" }}
+          >
+            {["Monthly Data", "Quarterly Data", "Yearly Data"].map((basis) => (
+              <option key={basis} value={basis}>
+                {basis}
+              </option>
+            ))}
+          </Form.Select>
+        </Form.Group>
+
+        <button className="btn btn-theme global-font" onClick={resetAllFilters}>
+          Reset All
+        </button>
       </div>
 
       {/* KPIs */}
-      <div className="d-flex gap-2 flex-wrap w-100">
-        {filteredKPIs.map((card, index) => (
-          <div
-            key={index}
-            className="global-cards p-2 flex-fill"
-            style={{ minWidth: "260px" }}
-          >
-            <p className="head-theme mb-2 fw-semibold">{card.title}</p>
-            <div className="d-flex gap-1 w-100">
-              {card.items.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="global-cards p-2 flex-fill text-start"
-                  style={{ minWidth: "120px" }}
-                >
-                  <p className="head-theme small text-muted mb-0">
-                    {item.label}
-                  </p>
-                  <p className="global-font fw-semibold mb-0 mt-0">
-                    {item.value}
-                  </p>
-                </div>
-              ))}
+      <div className="d-flex gap-2 flex-wrap w-100 mb-2">
+        {/* Current Delta Card */}
+        <div
+          className="global-cards p-2 flex-fill"
+          style={{ minWidth: "260px" }}
+        >
+          <p className="head-theme mb-2 fw-semibold">Current Delta</p>
+          <div className="d-flex gap-1 w-100">
+            <div className="global-cards p-2 flex-fill text-start">
+              <p className="head-theme small text-muted mb-0">Month</p>
+              <p className="global-font fw-semibold mb-0 mt-0">
+                ₹0.45 /Kg | May'25
+              </p>
+            </div>
+            <div className="global-cards p-2 flex-fill text-start">
+              <p className="head-theme small text-muted mb-0">Quarter</p>
+              <p className="global-font fw-semibold mb-0 mt-0">
+                ₹1.90 | Apr–Jun'25
+              </p>
             </div>
           </div>
-        ))}
+        </div>
+
+        {/* Next Delta (F) Card */}
+        <div
+          className="global-cards p-2 flex-fill"
+          style={{ minWidth: "260px" }}
+        >
+          <p className="head-theme mb-2 fw-semibold">Next Delta (F)</p>
+          <div className="d-flex gap-1 w-100">
+            <div className="global-cards p-2 flex-fill text-start">
+              <p className="head-theme small text-muted mb-0">Month</p>
+              <p className="global-font fw-semibold mb-0 mt-0">
+                ₹ -0.15 /Kg | Jun'25
+              </p>
+            </div>
+            <div className="global-cards p-2 flex-fill text-start">
+              <p className="head-theme small text-muted mb-0">Quarter</p>
+              <p className="global-font fw-semibold mb-0 mt-0">
+                ₹0.17 | Jul–Sep'25
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Accuracy Card */}
+        <div
+          className="global-cards p-2 flex-fill"
+          style={{ minWidth: "260px" }}
+        >
+          <p className="head-theme mb-2 fw-semibold">Accuracy</p>
+          <div className="d-flex gap-1 w-100">
+            <div className="global-cards p-2 flex-fill text-start">
+              <p className="head-theme small text-muted mb-0">Model</p>
+              <p className="global-font fw-semibold mb-0 mt-0">May-25: 98.7%</p>
+            </div>
+            <div className="global-cards p-2 flex-fill text-start">
+              <p className="head-theme small text-muted mb-0">
+                Delta Difference
+              </p>
+              <p className="global-font fw-semibold mb-0 mt-0">
+                May-25 : ₹0.81 /Kg
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Data As Of Card */}
+        <div
+          className="global-cards p-2 flex-fill"
+          style={{ minWidth: "260px" }}
+        >
+          <p className="head-theme mb-2 fw-semibold">Data As Of</p>
+          <div className="d-flex gap-1 w-100">
+            <div className="global-cards p-2 flex-fill text-start">
+              <p className="head-theme small text-muted mb-0">Price</p>
+              <p className="global-font fw-semibold mb-0 mt-0">May-25</p>
+            </div>
+            <div className="global-cards p-2 flex-fill text-start">
+              <p className="head-theme small text-muted mb-0">News</p>
+              <p className="global-font fw-semibold mb-0 mt-0">17-06-25</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Charts Section */}
@@ -1150,6 +1219,9 @@ const OverviewTab = () => {
                   className="w-100 mb-2 global-cards mt-2"
                   style={{ minHeight: "380px" }}
                 >
+                    <p className="head-theme text-start p-2">
+                  HRC Delta View
+                </p>
                   {deltaViewChart.series[0].data.length > 0 ||
                   deltaViewChart.series[1].data.length > 0 ? (
                     <Chart
@@ -1247,6 +1319,9 @@ const OverviewTab = () => {
                   className="w-100 mb-2 global-cards mt-2"
                   style={{ minHeight: "380px" }}
                 >
+                  <p className="head-theme text-start p-2">
+                  Settled Delta View
+                </p>
                   {settledDeltaChart.series[0].data.length > 0 ? (
                     <Chart
                       options={settledDeltaChart.options}
@@ -1280,6 +1355,10 @@ const OverviewTab = () => {
 
           <Tab eventKey="QuarterlyDelta" title="Static Quarterly Data">
             <p className="text-start global-font ms-2 mt-2 mb-1">
+              <p className="head-theme text-start">
+                 Static Quarterly Data
+                </p>
+                <div className="px-2">
               <strong>NOTE:</strong>
               <br />
               1. The quarterly delta forecasts shown in table were finalized at
@@ -1291,6 +1370,7 @@ const OverviewTab = () => {
               STATXO's forecasted price for June has been used for Q2 (F)
               accuracy calculation and the Percent may slightly change once the
               actual price is available.
+              </div>
             </p>
             <div className="table-container mb-2">
               <table className="table table-bordered table-sm m-0">
