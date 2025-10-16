@@ -39,12 +39,12 @@ const CommodityIntelligenceNew = () => {
         <Tab eventKey="MacroEconomicIndicator" title="Macroeconomic Indicator">
           <MacroEconomicIndicatorTab />
         </Tab>
-        {/* <Tab eventKey="PriceDecomposition" title="Price Decomposition">
+        <Tab eventKey="PriceDecomposition" title="Price Decomposition">
           <PriceDecompositionTab />
         </Tab>
         <Tab eventKey="EventImpact" title="Event Impact">
           <EventImpactTab />
-        </Tab> */}
+        </Tab>
       </Tabs>
     </div>
   );

@@ -91,7 +91,7 @@ const MacroEconomicIndicatorTab = () => {
       <div className="row g-2 mb-2">
         {kpiData.map((kpi, idx) => (
           <div key={idx} className="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
-            <div className="global-cards h-100 p-2">
+            <div className="global-cards p-2">
               <p className="kpi-label small fw-medium mb-1 text-truncate">
                 {kpi.label}
               </p>
